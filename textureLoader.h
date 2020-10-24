@@ -10,7 +10,8 @@ using namespace sf;
 enum Objects{
 	PLAYER,
 	PLANET,
-	ASTEROID
+	ASTEROID,
+	WEAPON
 };
 
 class textureLoader
@@ -19,6 +20,7 @@ public:
 	std::vector<Texture> players;
 	std::vector<Texture> planets;
 	std::vector<Texture> asteroids;
+	std::vector<Texture> weapons;
 	Texture background;
 
 	textureLoader() = default;

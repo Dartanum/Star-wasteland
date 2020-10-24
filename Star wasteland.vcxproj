@@ -139,10 +139,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="asteroid.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="planet.cpp" />
     <ClCompile Include="player.cpp" />
+    <ClCompile Include="spawner.cpp" />
     <ClCompile Include="textureLoader.cpp" />
+    <ClCompile Include="weapon.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -151,7 +154,9 @@
     <ClInclude Include="asteroid.h" />
     <ClInclude Include="planet.h" />
     <ClInclude Include="player.h" />
+    <ClInclude Include="spawner.h" />
     <ClInclude Include="textureLoader.h" />
+    <ClInclude Include="weapon.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
