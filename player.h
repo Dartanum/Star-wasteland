@@ -16,20 +16,33 @@ public:
 	Player(Sprite sprite, const int& speed, const double& angularSpeed, Vector2u screen, const int& w, const int& h);
 	Player(const Player&) = default;
 
-	void flyForward(float time, float& currentFrame); // смена анимации при движении вперед
-	void flyBack(const float& time); //остановка при движении назад
-	void flyLeft(const float& time); //поворот влево на месте
-	void flyRight(const float& time); //поворот вправо на месте
-	void Move(bool forward); //передвижение игрока
-	void flyForwardAndBack(); //одновременное нажатие вперед и назад
-	void standartCondition(); //установление стандартного состояния корабля (без пламяни)
+	// смена анимации при движении вперед
+	void flyForward(float time, float& currentFrame);
+	//остановка при движении назад
+	void flyBack(const float& time); 
+	//поворот влево на месте
+	void flyLeft(const float& time); 
+	//поворот вправо на месте
+	void flyRight(const float& time); 
+	//передвижение игрока
+	void Move(bool forward); 
+	//одновременное нажатие вперед и назад
+	void flyForwardAndBack(); 
+	//установление стандартного состояния корабля (без пламяни)
+	void standartCondition();
 	Vector2f getPos();
 private:
-	int speed; //скорость движения вперед
-	float time; //время из мэйна для смены анимации
-	double angularSpeed; //скорость вращения
-	int width; //ширина тела корабля
-	int heigth; //высота тела корабля
-	Vector2u screen; //рахмер экрана
+	//скорость движения вперед
+	int speed; 
+	//время из мэйна для смены анимации
+	float time; 
+	//скорость вращения
+	double angularSpeed; 
+	//ширина тела корабля
+	int width; 
+	//высота тела корабля
+	int heigth; 
+	//размер экрана
+	Vector2u screen; 
 };
 #endif

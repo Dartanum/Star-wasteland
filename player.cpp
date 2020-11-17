@@ -29,22 +29,22 @@ void Player::Move(bool forward) {
 
 void Player::flyForward(float time, float& currentFrame) {
     currentFrame += 0.005 * time;
-    if (currentFrame < 0.25) {
+    if (currentFrame < 0.5) {
         player.setTextureRect(IntRect(4, 0, 114, 109));
     }
-    if (currentFrame > 0.25 && currentFrame < 0.5) {
+    if (currentFrame > 0.5 && currentFrame < 1.0) {
         player.setTextureRect(IntRect(121, 0, 114, 109));
     }
-    if (currentFrame > 0.5 && currentFrame < 0.75) {
+    if (currentFrame > 1.0 && currentFrame < 1.5) {
         player.setTextureRect(IntRect(4, 111, 114, 109));
     }
-    if (currentFrame > 0.75 && currentFrame < 1.0) {
+    if (currentFrame > 1.5 && currentFrame < 2.0) {
         player.setTextureRect(IntRect(121, 111, 114, 109));
     }
-    if (currentFrame > 1.0) {
+    if (currentFrame > 2.0) {
         player.setTextureRect(IntRect(238, 111, 114, 109));
     }
-    if (currentFrame > 1.25) currentFrame = 0.25;
+    if (currentFrame > 2.5) currentFrame = 0.25;
     Move(true);
 }
 
