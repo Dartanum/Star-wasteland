@@ -10,11 +10,12 @@ public:
 	float size;
 	float angularSpeed;
 	Vector2f position;
-	Sprite planet;
+	CircleShape planet;
 	Planet() = default;
 	Planet(const Planet&) = default;
 	Planet(float Size, float AngularSpeed, Texture& Texture, Vector2f Position);
 
+	bool Intersects(RectangleShape shape);
 	void Rotation();
 };
 #endif

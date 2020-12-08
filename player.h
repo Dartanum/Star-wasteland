@@ -10,10 +10,10 @@ using namespace sf;
 
 class Player {
 public:
-	Sprite player; //спрайт игрока
+	RectangleShape player; //спрайт игрока
 
 	Player() = default;
-	Player(Sprite sprite, const int& speed, const double& angularSpeed, Vector2u screen, const int& w, const int& h);
+	Player(Texture& texture, const int& speed, const double& angularSpeed, Vector2u screen, const int& w, const int& h);
 	Player(const Player&) = default;
 
 	// смена анимации при движении вперед
@@ -31,6 +31,13 @@ public:
 	//установление стандартного состояния корабля (без пламяни)
 	void standartCondition();
 	Vector2f getPos();
+	//анимация взрыва при проигрыше
+	void Destroy(std::vector<Texture>& textures);
+
+	Clock dest_anim_clock;
+	Sprite dest_sprite;
+	bool anim_end;
+	Vector2f pos_die;
 private:
 	//скорость движения вперед
 	int speed; 

@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include <iosfwd>
 #include "player.h"
+#include "textureLoader.h"
 
 using namespace sf;
 
@@ -10,7 +11,7 @@ class Asteroid {
 public:
 	Asteroid() = default;
 	Asteroid(Asteroid&) = default;
-	Asteroid(float Size, float AngularSpeed, float Speed, float kd, Vector2f SpawnPosition, int SpawnTime, Texture& texture);
+	Asteroid(float Size, float Speed, float kd, Vector2f SpawnPosition, int SpawnTime, Texture& texture);
 	//перемещение астероида на игрока
 	void Move(Player& player);
 	//обновление позиции астероида
@@ -22,8 +23,16 @@ public:
 	void setAsteroidMove(bool am) { asteroidIsMove = am; }
 	bool& getAsteroidMove() { return asteroidIsMove; }
 	int getKD() { return KD; }
-	Sprite asteroid;
+	void setSpeed(float newSpeed) { speed = newSpeed; }
+	float getSpeed() { return speed; }
+	void setKD(float newKD) { KD = newKD; }
+	void Destroy(std::vector<Texture>& textures);
+	Sprite dest_sprite;
+	RectangleShape asteroid;
 	Clock clock;
+	Clock dest_anim_clock;
+	Vector2f dest_pos;
+	bool destroy;
 private:
 	float size;
 	bool flag = true;
@@ -31,7 +40,6 @@ private:
 	bool asteroidIsMove;
 	int angleRotation;
 	float speed;
-	float angularSpeed;
 	float KD;
 	int spawnTime;
 	Vector2f spawnPosition;

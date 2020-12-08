@@ -11,7 +11,8 @@ enum Objects{
 	PLAYER,
 	PLANET,
 	ASTEROID,
-	WEAPON
+	WEAPON,
+	DEST_EFFECT
 };
 
 class textureLoader
@@ -21,6 +22,7 @@ public:
 	std::vector<Texture> planets;
 	std::vector<Texture> asteroids;
 	std::vector<Texture> weapons;
+	std::vector<Texture> dest_effect;
 	Texture background;
 
 	textureLoader() = default;

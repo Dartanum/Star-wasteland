@@ -2,11 +2,14 @@
 #include <vector>
 #include <math.h>
 
-Player::Player(Sprite sprite, const int& speed, const double& angularSpeed, Vector2u Screen, const int& w, const int& h) : player(sprite), screen(Screen) {
+Player::Player(Texture& texture, const int& speed, const double& angularSpeed, Vector2u Screen, const int& w, const int& h) : screen(Screen) {
+  player.setTexture(&texture);
+  player.setSize(Vector2f(w, h));
     Player::speed = speed;
     Player::angularSpeed = angularSpeed;
     player.setOrigin(w / 2, h / 2);
     player.setPosition(500, 500);
+    anim_end = false;
 }
 
 void Player::Move(bool forward) { 
@@ -70,4 +73,19 @@ void Player::standartCondition() {
 
 Vector2f Player::getPos() {
     return player.getPosition();
+}
+
+void Player::Destroy(std::vector<Texture>& textures) {
+  int currentFrame = dest_anim_clock.getElapsedTime().asMilliseconds() / 16;
+  dest_sprite.setPosition(pos_die);
+  int anim_speed = 2;
+  for (ptrdiff_t i = 0; i < textures.size() * anim_speed; i += anim_speed) {
+    if (currentFrame >= textures.size() * anim_speed) {
+      anim_end = true;
+      break;
+    }
+    if (currentFrame > i && currentFrame < i + anim_speed) {
+      dest_sprite.setTexture(textures[i / (anim_speed * 2)]);
+    }
+  }
 }

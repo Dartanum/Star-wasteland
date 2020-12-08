@@ -21,6 +21,9 @@ void textureLoader::loader(enum Objects obj, std::vector<String>& paths) {
 			case Objects::WEAPON:
 				weapons.push_back(i);
 				break;
+			case Objects::DEST_EFFECT:
+				dest_effect.push_back(i);
+				break;
 			}	
 		}
 }
@@ -40,6 +43,9 @@ void textureLoader::loader(enum Objects obj, String& path) {
 			break;
 		case Objects::WEAPON:
 			weapons.push_back(texture);
+			break;
+		case Objects::DEST_EFFECT:
+			dest_effect.push_back(texture);
 			break;
 		}
 }

@@ -1,7 +1,8 @@
 #include "weapon.h"
 
-Weapon::Weapon(Texture& texture, float Speed) : speed(Speed){
+Weapon::Weapon(Texture& texture, float Speed, float kd) : speed(Speed), KD(kd) {
 	weapon.setTexture(texture);
+	weaponIsMove = true;
 	weapon.setOrigin(weapon.getLocalBounds().width / 2, weapon.getLocalBounds().height / 2);
 }
 
