@@ -6,6 +6,7 @@
 #include "spawner.h"
 
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <math.h>
 #include <sstream>
 #include <random>
@@ -16,6 +17,7 @@ using namespace sf;
 
 int main(int args, char *argv[])
 {
+//---------------------------------ÒÅÊÑÒÓÐÛ È ØÐÈÔÒÛ------------------------------------------
     textureLoader tl;
     Texture texture;
 
@@ -37,6 +39,23 @@ int main(int args, char *argv[])
     tl.loader(Objects::WEAPON, path);
     Font font;
     font.loadFromFile("fonts/17734.otf");
+//---------------------------------ÌÓÇÛÊÀ È ÇÂÓÊÈ---------------------------------
+    SoundBuffer boomBuffer;
+    if (!boomBuffer.loadFromFile("sounds/Boom.ogg"))
+      return -1;
+    boomBuffer.loadFromFile("sounds/Boom.ogg");
+    Sound boom(boomBuffer);
+    boom.setVolume(20);
+    SoundBuffer shootBuffer;
+    if (!shootBuffer.loadFromFile("sounds/shoot.ogg"))
+      return -1;
+    shootBuffer.loadFromFile("sounds/shoot.ogg");
+    Sound shoot(shootBuffer);
+    Music music;
+    if (!music.openFromFile("music/spaceMusic.ogg"))
+      return -1;
+    music.openFromFile("music/spaceMusic.ogg");
+
     Text lifetime;
     Text pointCount;
     pointCount.setFont(font);
@@ -88,6 +107,9 @@ int main(int args, char *argv[])
     asteroids.push_back(new Asteroid(sizeAsteroid, speed + 95, asteroidKD, spawnAsteroid.generator(screen), 60, tl.asteroids[0]));
     while (window.isOpen())
     {
+      if (!music.getStatus()) {
+        music.play();
+      }
         float time = clock.getElapsedTime().asMicroseconds();
         clock.restart();
         time /= 800;
@@ -122,6 +144,7 @@ int main(int args, char *argv[])
           if (!spaceClick && weapon.getIsMove()) {
             spaceClick = true;
             weapon.clock.restart();
+            shoot.play();
           }
         }
           //îáðàáîòêà ëîãîâ èãðû
@@ -168,6 +191,7 @@ int main(int args, char *argv[])
                 pointCount.setScale(2.0, 2.0);
                 player.dest_anim_clock.restart();
                 player.pos_die = Vector2f(player.getPos().x - player.player.getGlobalBounds().width/2, player.getPos().y - player.player.getGlobalBounds().height / 2);
+                boom.play();
                 break;
               }
             }
@@ -205,6 +229,7 @@ int main(int args, char *argv[])
                 weapon.setIsMove(false);
                 (*it)->setAsteroidMove(false);
                 points += 100;
+                boom.play();
               }
               if ((*it)->destroy) {
                 (*it)->Destroy(tl.dest_effect);
@@ -222,6 +247,7 @@ int main(int args, char *argv[])
                 (*it)->destroy = true;
                 (*it)->update(spawnAsteroid.generator(screen));
                 (*it)->setAsteroidMove(false);
+                boom.play();
               }
             }
           }
