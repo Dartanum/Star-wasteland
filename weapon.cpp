@@ -18,7 +18,7 @@ void Weapon::Move(Player& player) {
 	weapon.move(direction.x * sin(-weapon.getRotation() * PI / 180) * speed / 3000, direction.y * cos(-weapon.getRotation() * PI / 180) * speed / 3000);
 }
 
-void Weapon::update(Vector2u screen) {
+void Weapon::update() {
 	flag = true;
-	weapon.setPosition(- 100, - 100);
+	weapon.setPosition(- 1000, - 1000);
 }

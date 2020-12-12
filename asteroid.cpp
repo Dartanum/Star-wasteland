@@ -47,6 +47,7 @@ void Asteroid::Destroy(std::vector<Texture>& textures) {
 		}
 		if (currentFrame > i && currentFrame < i + anim_speed) {
 			dest_sprite.setTexture(textures[i/(anim_speed*2)]);
+			break;
 		}
 	}
 }

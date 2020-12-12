@@ -14,7 +14,7 @@ public:
 	Weapon(Weapon&) = default;
 	Weapon(Texture& texture, float Speed, float kd);
 	void Move(Player& player);
-	void update(Vector2u screen);
+	void update();
 	bool getIsMove() { return weaponIsMove; }
 	void setIsMove(bool newMove) { weaponIsMove = newMove; }
 	float getKD() { return KD; }
