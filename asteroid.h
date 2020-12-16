@@ -11,7 +11,7 @@ class Asteroid {
 public:
 	Asteroid() = default;
 	Asteroid(Asteroid&) = default;
-	Asteroid(float Size, float Speed, float kd, Vector2f SpawnPosition, int SpawnTime, Texture& texture);
+	Asteroid(float Size, double Speed, float kd, Vector2f SpawnPosition, int SpawnTime, Texture& texture);
 	//перемещение астероида на игрока
 	void Move(Player& player);
 	//обновление позиции астероида
@@ -39,7 +39,7 @@ private:
 	bool exist;
 	bool asteroidIsMove;
 	int angleRotation;
-	float speed;
+	double speed;
 	float KD;
 	int spawnTime;
 	Vector2f spawnPosition;

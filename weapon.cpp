@@ -1,6 +1,6 @@
 #include "weapon.h"
 
-Weapon::Weapon(Texture& texture, float Speed, float kd) : speed(Speed), KD(kd) {
+Weapon::Weapon(Texture& texture, double Speed, float kd) : speed(Speed), KD(kd) {
 	weapon.setTexture(texture);
 	weaponIsMove = true;
 	weapon.setOrigin(weapon.getLocalBounds().width / 2, weapon.getLocalBounds().height / 2);
@@ -15,7 +15,7 @@ void Weapon::Move(Player& player) {
 		flag = false;
 	}
 	Vector2f direction(weapon.getOrigin().x - 90, weapon.getOrigin().y - 90);
-	weapon.move(direction.x * sin(-weapon.getRotation() * PI / 180) * speed / 3000, direction.y * cos(-weapon.getRotation() * PI / 180) * speed / 3000);
+	weapon.move(direction.x * sin(-weapon.getRotation() * PI / 180) * speed, direction.y * cos(-weapon.getRotation() * PI / 180) * speed);
 }
 
 void Weapon::update() {

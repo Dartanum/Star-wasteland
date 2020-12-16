@@ -140,9 +140,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="asteroid.cpp" />
+    <ClCompile Include="CheckBox.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Menu.cpp" />
+    <ClCompile Include="MenuButton.cpp" />
     <ClCompile Include="planet.cpp" />
     <ClCompile Include="player.cpp" />
+    <ClCompile Include="Rollover.cpp" />
+    <ClCompile Include="settings.cpp" />
     <ClCompile Include="spawner.cpp" />
     <ClCompile Include="textureLoader.cpp" />
     <ClCompile Include="weapon.cpp" />
@@ -152,8 +157,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="asteroid.h" />
+    <ClInclude Include="CheckBox.h" />
+    <ClInclude Include="Menu.h" />
+    <ClInclude Include="MenuButton.h" />
     <ClInclude Include="planet.h" />
     <ClInclude Include="player.h" />
+    <ClInclude Include="Rollover.h" />
+    <ClInclude Include="settings.h" />
     <ClInclude Include="spawner.h" />
     <ClInclude Include="textureLoader.h" />
     <ClInclude Include="weapon.h" />

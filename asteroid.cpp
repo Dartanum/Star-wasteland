@@ -1,6 +1,6 @@
 #include "asteroid.h"
 
-Asteroid::Asteroid(float Size, float Speed, float kd, Vector2f SpawnPosition, int SpawnTime, Texture& texture) :
+Asteroid::Asteroid(float Size, double Speed, float kd, Vector2f SpawnPosition, int SpawnTime, Texture& texture) :
 	size(Size), speed(Speed), spawnPosition(SpawnPosition), spawnTime(SpawnTime), KD(kd) {
 	exist = false;
 	clock.restart();
@@ -26,7 +26,7 @@ void Asteroid::Move(Player& player) {
 		asteroid.setRotation(angleRotation);
 		flag = false;
 	}
-	asteroid.move(direction.x * sin(-asteroid.getRotation() * PI / 180) * speed / 3000, direction.y * cos(-asteroid.getRotation() * PI / 180) * speed / 3000);
+	asteroid.move(direction.x * sin(-asteroid.getRotation() * PI / 180) * speed, direction.y * cos(-asteroid.getRotation() * PI / 180) * speed);
 }
 
 void Asteroid::update(Vector2f spawn) {

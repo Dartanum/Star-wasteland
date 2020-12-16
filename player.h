@@ -13,7 +13,7 @@ public:
 	RectangleShape player; //спрайт игрока
 
 	Player() = default;
-	Player(Texture& texture, const int& speed, const double& angularSpeed, Vector2u screen, const int& w, const int& h);
+	Player(Texture& texture, const double& speed, const double& angularSpeed, Vector2u screen, const int& w, const int& h);
 	Player(const Player&) = default;
 
 	// смена анимации при движении вперед
@@ -40,7 +40,7 @@ public:
 	Vector2f pos_die;
 private:
 	//скорость движения вперед
-	int speed; 
+	double speed; 
 	//время из мэйна для смены анимации
 	float time; 
 	//скорость вращения

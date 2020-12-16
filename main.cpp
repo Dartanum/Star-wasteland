@@ -4,9 +4,9 @@
 #include "asteroid.h"
 #include "weapon.h"
 #include "spawner.h"
+#include "Menu.h"
+#include "settings.h"
 
-#include <SFML/Graphics.hpp>
-#include <SFML/Audio.hpp>
 #include <math.h>
 #include <sstream>
 #include <list>
@@ -17,9 +17,12 @@ using namespace sf;
 
 int main(int args, char *argv[])
 {
-  ContextSettings settings;
-  settings.antialiasingLevel = 16; //установка уровня сглаживания фигур
-  RenderWindow window(sf::VideoMode::getFullscreenModes()[0], "Test shapes", Style::Fullscreen, settings);
+  ContextSettings windowSettings;
+  windowSettings.antialiasingLevel = 16; //установка уровня сглаживания фигур
+  RenderWindow window(sf::VideoMode::getFullscreenModes()[0], "Star wasteland", Style::Fullscreen, windowSettings);
+  Vector2u screen = window.getSize();
+  double FPS = 60;
+  window.setFramerateLimit(FPS);
 //---------------------------------ТЕКСТУРЫ И ШРИФТЫ------------------------------------------
     textureLoader tl;
     Texture texture;
@@ -48,6 +51,17 @@ int main(int args, char *argv[])
     tl.loader(Objects::UI, path);
     Font font;
     font.loadFromFile("fonts/17734.otf");
+
+    Texture buttons, panel, logo;
+    buttons.loadFromFile("textures/Menu/blueSheet.png");
+    panel.loadFromFile("textures/Menu/grey_panel.png");
+    logo.loadFromFile("textures/logo.png");
+    std::string settingsPath = "text/settings.ini";
+
+    settings settingsGame(settingsPath);
+    settingsGame.read();
+    Menu main_menu(settingsGame, buttons, panel, tl.background, screen, font);
+    if (main_menu.menu(window, logo)) return 0;
 //---------------------------------МУЗЫКА И ЗВУКИ---------------------------------
     SoundBuffer boomBuffer;
     if (!boomBuffer.loadFromFile("sounds/Boom.ogg"))
@@ -74,6 +88,19 @@ int main(int args, char *argv[])
     if (!music.openFromFile("music/spaceMusic.ogg"))
       return -1;
     music.openFromFile("music/spaceMusic.ogg");
+    music.setVolume(settingsGame.musicVolume);
+    if (settingsGame.soundIsOn) {
+      boom.setVolume(settingsGame.soundVolume);
+      destroy_planet.setVolume(settingsGame.soundVolume);
+      shoot.setVolume(settingsGame.soundVolume);
+      bornSound.setVolume(settingsGame.soundVolume);
+    }
+    else {
+      boom.setVolume(0);
+      destroy_planet.setVolume(0);
+      shoot.setVolume(0);
+      bornSound.setVolume(0);
+    }
 //---------------------------------ПЕРЕМЕННЫЕ ИГРЫ-------------------------------
     Text lifetime;
     Text pointCount;
@@ -83,8 +110,8 @@ int main(int args, char *argv[])
     int heigth = 75;
     int w = 112;
     int h = 107;
-    double speed = 165;
-    double angularSpeed = 1.5;
+    double speed = FPS / (FPS * 10);
+    double angularSpeed = 3;
     int sizePlanet = 150;
     float sizeAsteroid = 1024/10; 
     int gameTime = 0; //прошедшое в секундах время игры
@@ -97,6 +124,7 @@ int main(int args, char *argv[])
     float weaponKD = 1.5; //время, через которое бластер обновляется
     float asteroidKD = 5; //время, через которое астероид обновляется
     float currentFrame = 0; //текущий кадр
+    int timeLastFrame = 0;
     int radius;
     int area;
     std::vector<Vector2f> spawnPointsPlanet;
@@ -104,7 +132,6 @@ int main(int args, char *argv[])
 
     background.setTexture(tl.background);
 
-    Vector2u screen = window.getSize();
     //установка точек-границ спавна планет
     for (ptrdiff_t i = 0; i < 3; i++) {
       spawnPointsPlanet.push_back(Vector2f(screen.x / 3 * i, 0));
@@ -122,22 +149,22 @@ int main(int args, char *argv[])
     lifetime.setPosition(screen.x - 200, 0);
     pointCount.setPosition(screen.x - 200, 40);
 
-    asteroids.push_back(new Asteroid(sizeAsteroid, speed + 100, asteroidKD, spawner.generatorAsteroids(screen), 10, tl.asteroids[0]));
-    asteroids.push_back(new Asteroid(sizeAsteroid, speed + 93, asteroidKD, spawner.generatorAsteroids(screen), 20, tl.asteroids[0]));
-    asteroids.push_back(new Asteroid(sizeAsteroid, speed + 90, asteroidKD, spawner.generatorAsteroids(screen), 30, tl.asteroids[0]));
-    asteroids.push_back(new Asteroid(sizeAsteroid, speed + 102, asteroidKD, spawner.generatorAsteroids(screen), 60, tl.asteroids[0]));
-    asteroids.push_back(new Asteroid(sizeAsteroid, speed + 95, asteroidKD, spawner.generatorAsteroids(screen), 120, tl.asteroids[0]));
+    asteroids.push_back(new Asteroid(sizeAsteroid, spawner.generator(speed, 0.2), asteroidKD, spawner.generatorAsteroids(screen), 5, tl.asteroids[0]));
+    asteroids.push_back(new Asteroid(sizeAsteroid, spawner.generator(speed, 0.2), asteroidKD, spawner.generatorAsteroids(screen), 20, tl.asteroids[0]));
+    asteroids.push_back(new Asteroid(sizeAsteroid, spawner.generator(speed, 0.2), asteroidKD, spawner.generatorAsteroids(screen), 30, tl.asteroids[0]));
+    asteroids.push_back(new Asteroid(sizeAsteroid, spawner.generator(speed, 0.2), asteroidKD, spawner.generatorAsteroids(screen), 60, tl.asteroids[0]));
+    asteroids.push_back(new Asteroid(sizeAsteroid, spawner.generator(speed, 0.2), asteroidKD, spawner.generatorAsteroids(screen), 120, tl.asteroids[0]));
     radius = spawner.generator(100, sizePlanet);
     area = spawner.chooseArea(spawnPointsPlanet, useSpawnPointsPlanet);
-    planets.push_back(new Planet(radius, 5.0f, tl.planets[spawner.generator(0, tl.planets.size()-1)], spawner.generatorPlanets(screen, spawnPointsPlanet, radius, area), 3, 5, area, font, tl.ui[0]));
+    planets.push_back(new Planet(radius, 5.0f, tl.planets[spawner.generator(0, tl.planets.size()-1)], spawner.generatorPlanets(screen, spawnPointsPlanet, radius, area), radius/10, 5, area, font, tl.ui[0]));
     radius = spawner.generator(100, sizePlanet);
     area = spawner.chooseArea(spawnPointsPlanet, useSpawnPointsPlanet);
-    planets.push_back(new Planet(radius, 9.0f, tl.planets[spawner.generator(0, tl.planets.size() - 1)], spawner.generatorPlanets(screen, spawnPointsPlanet, radius, area), 15, 8, area, font, tl.ui[0]));
+    planets.push_back(new Planet(radius, 9.0f, tl.planets[spawner.generator(0, tl.planets.size() - 1)], spawner.generatorPlanets(screen, spawnPointsPlanet, radius, area), radius/10, 10, area, font, tl.ui[0]));
 //-------------------------------ИГРОВОЙ ПРОЦЕСС---------------------------------------------------------------
     while (window.isOpen())
     {
       //проигрывание музыки
-      if (!music.getStatus()) {
+      if (!music.getStatus() && settingsGame.musicIsOn) {
         music.play();
       }
         float time = clock.getElapsedTime().asMicroseconds();
@@ -175,6 +202,9 @@ int main(int args, char *argv[])
             shoot.play();
           }
         }
+        if (Keyboard::isKeyPressed(Keyboard::Escape)) {
+          //пауза
+        }
 //--------------------------------ИНФОРМАЦИЯ--------------------------------------------------
           std::ostringstream gameTimeString, playerPointsString;
           gameTimeString << gameTime;
@@ -183,12 +213,13 @@ int main(int args, char *argv[])
           pointCount.setString("Points: " + playerPointsString.str());
 
 //------------------------------ПОВЫШЕНИЕ СЛОЖНОСТИ-------------------------------------------
-          if (gameTime != 0 && gameTime % 30 == 0) {
+          if (gameTime != 0 && gameTime % 30 == 0 && timeLastFrame != gameTime) {
+             timeLastFrame = gameTime;
             for (it = asteroids.begin(); it != asteroids.end(); it++) {
-              if((*it)->getSpeed() < 320)
-                (*it)->setSpeed((*it)->getSpeed() + 10);
-              if((*it)->getKD() > 4)
-                (*it)->setKD((*it)->getKD() - 0.25);
+              if((*it)->getSpeed() < speed * 3)
+                (*it)->setSpeed((*it)->getSpeed()*1.1);
+              if((*it)->getKD() > asteroidKD / 2)
+                (*it)->setKD((*it)->getKD()*0.9);
             }
           }
 //---------------------------------НАЧАЛО ОТРИСОВКИ-------------------------------------------
@@ -212,7 +243,6 @@ int main(int args, char *argv[])
               (*it_p)->dest_anim_clock.restart();
               (*it_p)->born = false;
               (*it_p)->texture_planet = dest_effect_planet;
-              //(*it_p)->planet.setTextureRect(IntRect(0, 122, 130, 130));
               destroy_planet.play();
             }
             if ((*it_p)->destroy == true) {
@@ -223,7 +253,7 @@ int main(int args, char *argv[])
               radius = spawner.generator(100, sizePlanet);
               useSpawnPointsPlanet.erase((*it_p)->occupiedArea);
               area = spawner.chooseArea(spawnPointsPlanet, useSpawnPointsPlanet);
-              (*it_p)->Die(radius, 5.0f, tl.planets[spawner.generator(0, tl.planets.size() - 1)], spawner.generatorPlanets(screen, spawnPointsPlanet, radius, area), 4, 5, area);
+              (*it_p)->Die(radius, 5.0f, tl.planets[spawner.generator(0, tl.planets.size() - 1)], spawner.generatorPlanets(screen, spawnPointsPlanet, radius, area), radius/10, 5, area);
               continue;
             }
             //спавн планеты
@@ -333,6 +363,5 @@ int main(int args, char *argv[])
           }
           window.display();
     }
-
     return 0;
 }

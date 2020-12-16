@@ -2,7 +2,7 @@
 #include <vector>
 #include <math.h>
 
-Player::Player(Texture& texture, const int& speed, const double& angularSpeed, Vector2u Screen, const int& w, const int& h) : screen(Screen) {
+Player::Player(Texture& texture, const double& speed, const double& angularSpeed, Vector2u Screen, const int& w, const int& h) : screen(Screen) {
   player.setTexture(&texture);
   player.setSize(Vector2f(w, h));
     Player::speed = speed;
@@ -19,10 +19,10 @@ void Player::Move(bool forward) {
     float posY = player.getPosition().y;
     int absPosX = abs((int)posX);
     if (forward) {
-        player.move(-directionX * sin(-player.getRotation() * PI / 180) * speed / 3000, -directionY * cos(-player.getRotation() * PI / 180) * speed / 3000);
+        player.move(-directionX * sin(-player.getRotation() * PI / 180) * speed, -directionY * cos(-player.getRotation() * PI / 180) * speed);
     }
     else {
-        player.move(directionX * sin(-player.getRotation() * PI / 180) * speed / 3000, directionY * cos(-player.getRotation() * PI / 180) * speed / 3000);
+        player.move(directionX * sin(-player.getRotation() * PI / 180) * speed, directionY * cos(-player.getRotation() * PI / 180) * speed);
     }
     if (posX >= screen.x) player.setPosition((int)posX % screen.x, posY);
     else if (posX < -player.getLocalBounds().width / 2) player.setPosition(screen.x + posX / 4, posY);

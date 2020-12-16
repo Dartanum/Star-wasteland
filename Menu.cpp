@@ -1,0 +1,275 @@
+#include "Menu.h"
+
+Menu::Menu(settings& _setting, Texture& texture, Texture& backText, Texture& background_, Vector2u& ScreenSize, Font& font_) {
+  textures = texture;
+  background.setTexture(background_);
+  screenSize = ScreenSize;
+  font = font_;
+  back.setTexture(&backText);
+  buttonSize = Vector2f(screenSize.x / 10, screenSize.y / 20);
+  settings_ = _setting;
+
+  clickBuffer.loadFromFile("sounds/Menu/click1.ogg");
+  rolloverBuffer.loadFromFile("sounds/Menu/rollover2.ogg");
+
+  std::string line;
+  std::ifstream reader("text/rules.ini");
+  if (reader.is_open()) {
+    while (getline(reader, line)) {
+      rules += line + '\n';
+    }
+  }
+  reader.close();
+}
+
+bool Menu::menu(RenderWindow& window, Texture& logotip) {
+  bool isMenu = true;
+  int interval = 10;
+  int countBut = 5;
+  int butNum = -1;
+  int lastRoll = -1;
+  int lastClick = -1;
+  bool abroad = true;
+
+  logo.setTexture(logotip);
+  String names[] = {L"play", L"rules", L"records", L"settings", L"exit"};
+  for (ptrdiff_t i = 0; i < countBut; i++) {
+    buttons.push_back(MenuButton(textures, Vector2f(190, 50), Vector2f(0, 0), Vector2f(0, 49), buttonSize, names[i], font));
+  }
+
+  Sound clickSound(clickBuffer);
+  Sound rolloverSound(rolloverBuffer);
+
+  back.setSize(Vector2f(buttonSize.x + interval * 2, (buttonSize.y + interval) * countBut + interval));
+  back.setOrigin(back.getSize().x / 2, back.getSize().y / 2);
+  back.setPosition(screenSize.x / 2, screenSize.y / 2 + back.getSize().y / 2);
+  Vector2f subMenuPos(back.getPosition().x, back.getPosition().y);
+  logo.setOrigin(logo.getGlobalBounds().width/2, logo.getGlobalBounds().height / 2);
+  logo.setPosition(screenSize.x/2, screenSize.y/3);
+  buttons[0].setPos(back, interval);
+  for (ptrdiff_t i = 1; i < buttons.size(); i++) {
+    buttons[i].setPos(buttons[i-1], interval);
+  }
+//------------------------------Ã≈Õﬁ-------------------------------------
+  while (isMenu) {
+    Event event;
+    while (window.pollEvent(event))
+    {
+      if (event.type == Event::Closed)
+        window.close();
+    }
+    if (!clickSound.getStatus() && lastClick != -1) {
+      buttons[lastClick].standart();
+      lastClick = -1;
+    }
+    butNum = -1; //ÌÓÏÂ ÍÌÓÔÍË, Ì‡ ÍÓÚÓÛ˛ Ì‡‚Â‰ÂÌ ÍÛÒÓ
+    window.clear();
+    window.draw(background);
+    window.draw(logo);
+    window.draw(back);
+    abroad = true; //ÂÒÎË ÍÛÒÓ Á‡ „‡ÌËˆÂÈ ÍÌÓÔÓÍ, ÚÓ true
+    for (ptrdiff_t i = 0; i < buttons.size(); i++) {
+      if (buttons[i].container.contains(Mouse::getPosition(window))) {
+        abroad = false;
+      } 
+      else buttons[i].standart();
+    }
+    if (abroad) lastRoll = -1;
+    for (ptrdiff_t i = 0; i < buttons.size(); i++) {
+      if (buttons[i].container.contains(Mouse::getPosition(window))) {
+        if (lastRoll != i) rolloverSound.play();
+        buttons[i].button.setFillColor(Color::Green);
+        butNum = i;
+        lastRoll = i;
+      }
+      if (Mouse::isButtonPressed(Mouse::Left) && butNum == i) {
+        if (lastClick != i) clickSound.play();
+        buttons[i].click();
+        lastClick = i;
+      }
+      window.draw(buttons[i].button);
+      window.draw(buttons[i].text);
+      if (buttons[0].isClick) isMenu = false;
+      if (buttons[1].isClick) {
+        Rules(window);
+        break;
+      }
+      if (buttons[3].isClick) {
+        Settings(window);
+        break;
+      }
+      if (buttons[4].isClick) {
+        window.close();
+        return true;
+      }
+    }
+    window.display();
+  }
+  return false;
+}
+
+void Menu::Rules(RenderWindow& window) {
+  bool isOpen = true;
+  Sound clickSound(clickBuffer);
+  Text ruless;
+  ruless.setCharacterSize(16);
+  ruless.setFillColor(Color::Black);
+  ruless.setFont(font);
+  ruless.setString(rules);
+  MenuButton ButtonClose(textures, Vector2f(190, 50), Vector2f(0, 0), Vector2f(0, 49), buttonSize, L"close", font);
+  ButtonClose.setSizeRelativeText();
+  Vector2f interval(ruless.getGlobalBounds().width / 10, ruless.getGlobalBounds().height / 10);
+  RectangleShape listBack(Vector2f(ruless.getGlobalBounds().width + interval.x, ruless.getGlobalBounds().height + interval.y));
+  listBack.setTexture(back.getTexture());
+  listBack.setTextureRect(back.getTextureRect());
+  listBack.setOrigin(listBack.getGlobalBounds().width / 2, listBack.getGlobalBounds().height / 2);
+  listBack.setPosition(screenSize.x / 2, screenSize.y / 2);
+  ruless.setOrigin(ruless.getGlobalBounds().width / 2, ruless.getGlobalBounds().height / 2);
+  ruless.setPosition(listBack.getPosition());
+  ButtonClose.setPos(Vector2f(listBack.getPosition().x + listBack.getGlobalBounds().width / 2 - buttonSize.x / 2, listBack.getPosition().y + listBack.getGlobalBounds().height / 2 + buttonSize.y / 2));
+  bool chooseClose = false;
+
+  while (isOpen) {
+    isOpen = !ButtonClose.listen(window, clickSound);
+    window.clear();
+    window.draw(background);
+    window.draw(listBack);
+    window.draw(ruless);
+    window.draw(ButtonClose.button);
+    window.draw(ButtonClose.text);
+    window.display();
+  }
+}
+
+void Menu::Settings(RenderWindow& window) {
+  settings_.read();
+  std::vector<Vector2f> rects;
+  Texture sliderTexture;
+  sliderTexture.loadFromFile("textures/Menu/slider.png");
+  //“≈ —“
+  String soundS, musicS, volumeS;
+  soundS = "sound"; musicS = "music"; volumeS = "volume";
+  int charSize = screenSize.x * screenSize.y / 100000;
+  std::map<String, Text> texts;
+  std::map<String, Text>::iterator it;
+  texts[soundS] = Text();
+  texts[musicS] = Text();
+  texts[volumeS] = Text();
+  for (it = texts.begin(); it != texts.end(); it++) {
+    it->second.setCharacterSize(charSize);
+    it->second.setFillColor(Color::Black);
+    it->second.setFont(font);
+    it->second.setString(it->first);
+    it->second.setOrigin(it->second.getLocalBounds().width / 2, it->second.getLocalBounds().height / 2);
+  }
+  //›ÎÂÏÂÌÚ˚ ËÌÚÂÙÂÈÒ‡
+  RectangleShape listBack(Vector2f(screenSize.x / 4, screenSize.y / 4));
+  Vector2f sizeBut = Vector2f(listBack.getSize().x / 4, listBack.getSize().y / 8);
+  MenuButton ButtonClose(textures, Vector2f(190, 50), Vector2f(0, 0), Vector2f(0, 50), sizeBut, L"close", font);
+  MenuButton ButtonSave(textures, Vector2f(190, 50), Vector2f(0, 0), Vector2f(0, 50), sizeBut, L"save", font);
+  Rollover lineS(sliderTexture, textures, IntRect(388, 72, 28, 39), Vector2f(listBack.getSize().x / 3, sliderTexture.getSize().y), settings_.soundVolume, font, charSize);
+  Rollover lineM(sliderTexture, textures, IntRect(388, 72, 28, 39), Vector2f(listBack.getSize().x / 3, sliderTexture.getSize().y), settings_.musicVolume, font, charSize);
+  rects = chooseStateCheckbox(true);
+  CheckBox checkboxS(textures, Vector2f(36, 36), rects[0], rects[1], Vector2f(texts[soundS].getGlobalBounds().width / 2, texts[soundS].getGlobalBounds().width / 2), settings_.soundIsOn);
+  rects = chooseStateCheckbox(false);
+  CheckBox checkboxM(textures, Vector2f(36, 36), rects[0], rects[1], checkboxS.size, settings_.musicIsOn);
+  listBack.setTexture(back.getTexture());
+  listBack.setTextureRect(back.getTextureRect());
+  listBack.setOrigin(listBack.getLocalBounds().width / 2, listBack.getLocalBounds().height / 2);
+  listBack.setPosition(screenSize.x / 2, screenSize.y / 2);
+  Vector2f interval(listBack.getSize().x / 20, listBack.getSize().y / 20);
+  ButtonSave.setPos(Vector2f(listBack.getPosition().x - listBack.getSize().x / 2 + ButtonSave.size.x / 2 + interval.x, listBack.getPosition().y + listBack.getSize().y / 2 - ButtonSave.size.y / 2 - interval.y));
+  ButtonClose.setPos(Vector2f(listBack.getPosition().x + listBack.getSize().x / 2 - ButtonClose.size.x / 2 - interval.x, ButtonSave.button.getPosition().y));
+  //Õ¿—“–Œ… » «¬” ¿
+  texts[soundS].setPosition(listBack.getPosition().x - listBack.getSize().x / 2 + texts[soundS].getLocalBounds().width / 2 + interval.x,
+                            listBack.getPosition().y - listBack.getSize().y / 2 + texts[soundS].getLocalBounds().height / 2 + interval.y);
+  checkboxS.setPos(Vector2f(texts[soundS].getPosition().x, texts[soundS].getPosition().y + checkboxS.size.y + interval.y));
+  texts[volumeS].setPosition(listBack.getPosition().x + listBack.getSize().x / 2 - texts[volumeS].getLocalBounds().width / 2 - interval.x, texts[soundS].getPosition().y);
+  lineS.setPos(Vector2f(listBack.getPosition().x, listBack.getPosition().y - listBack.getSize().y / 2 + texts[volumeS].getLocalBounds().height * 4));
+  //Õ¿—“–Œ… » Ã”«€ »
+  int intervalY = listBack.getSize().y / 2 - interval.y;
+  texts[musicS].setPosition(texts[soundS].getPosition().x, texts[soundS].getPosition().y + intervalY);
+  checkboxM.setPos(Vector2f(checkboxS.button.getPosition().x, checkboxS.button.getPosition().y + intervalY));
+  lineM.setPos(Vector2f(lineS.position.x, lineS.position.y + intervalY));
+
+  bool isOpen = true;
+  settings newSettings(settings_);
+  Sound clickSound(clickBuffer);
+  while (isOpen)
+  {
+    if (checkboxS.listen(window, clickSound)) {
+      newSettings.soundIsOn = !newSettings.soundIsOn;
+    }
+    if (checkboxM.listen(window, clickSound)) {
+      newSettings.musicIsOn = !newSettings.musicIsOn;
+    }
+    if (ButtonClose.listen(window, clickSound)) {
+      isOpen = false;
+    }
+    else if (ButtonSave.listen(window, clickSound)) {
+      newSettings.soundVolume = lineS.process;
+      newSettings.musicVolume = lineM.process;
+      settings_ = newSettings;
+      settings_.write();
+    }
+    if(lineS.containerSlider.contains(Mouse::getPosition(window)))
+      lineS.listen(window);
+    else if(lineM.containerSlider.contains(Mouse::getPosition(window)))
+    lineM.listen(window);
+    window.clear();
+    window.draw(background);
+    window.draw(listBack);
+    for (it = texts.begin(); it != texts.end(); it++) {
+      window.draw(it->second);
+    }
+    window.draw(ButtonSave.button);
+    window.draw(ButtonSave.text);
+    window.draw(ButtonClose.button);
+    window.draw(ButtonClose.text);
+    window.draw(checkboxS.button);
+    window.draw(checkboxM.button);
+    window.draw(lineS.line);
+    window.draw(lineM.line);
+    window.draw(lineS.slider);
+    window.draw(lineM.slider);
+    window.draw(lineS.processText);
+    window.draw(lineM.processText);
+    texts[volumeS].setPosition(texts[volumeS].getPosition().x, texts[volumeS].getPosition().y + intervalY);
+    window.draw(texts[volumeS]);
+    texts[volumeS].setPosition(texts[volumeS].getPosition().x, texts[volumeS].getPosition().y - intervalY);
+    window.display();
+  }
+}
+
+double Menu::calcDistanceVolume(RectangleShape& slider, int volume) {
+  return slider.getPosition().x + (slider.getSize().x / 100.0 * volume);
+}
+
+std::vector<Vector2f> Menu::chooseStateCheckbox(bool isSound) {
+  Vector2f beginRect;
+  Vector2f nextRect;
+  std::vector<Vector2f> result;
+  if (isSound) {
+    if (settings_.soundIsOn) {
+      beginRect = Vector2f(381, 36);
+      nextRect = Vector2f(381, 0);
+    }
+    else {
+      beginRect = Vector2f(381, 0);
+      nextRect = Vector2f(381, 36);
+    }
+  }
+  else {
+    if (settings_.musicIsOn) {
+      beginRect = Vector2f(381, 36);
+      nextRect = Vector2f(381, 0);
+    }
+    else {
+      beginRect = Vector2f(381, 0);
+      nextRect = Vector2f(381, 36);
+    }
+  }
+  result.push_back(beginRect);
+  result.push_back(nextRect);
+  return result;
+}

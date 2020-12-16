@@ -57,3 +57,13 @@ int Spawner::generator(int min, int max) {
   std::mt19937 mersenne(rd());
   return range(mersenne);
 }
+
+double Spawner::generator(double min, double max) {
+  int Min = min * 1000;
+  int Max = max * 1000;
+  std::uniform_int_distribution<> range(Min, Max);
+  std::mt19937 mersenne(rd());
+  int num = range(mersenne);
+  double result = num / 1000.0;
+  return result;
+}

@@ -60,6 +60,7 @@ void Planet::Die(float Size, float AngularSpeed, Texture& Texture, Vector2f Posi
 	size = Size;
 	planet.setRadius(size);
 	planet.setOrigin(Vector2f(size, size));
+	planet.setPosition(Position);
 	angularSpeed = AngularSpeed;
 	position = Position;
 	spawnKD = spawnKD_;

@@ -12,7 +12,7 @@ public:
 	Clock clock;
 	Weapon() = default;
 	Weapon(Weapon&) = default;
-	Weapon(Texture& texture, float Speed, float kd);
+	Weapon(Texture& texture, double Speed, float kd);
 	void Move(Player& player);
 	void update();
 	bool getIsMove() { return weaponIsMove; }
@@ -21,7 +21,7 @@ public:
 private:
 	bool flag = true;
 	float KD;
-	float speed;
+	double speed;
 	bool weaponIsMove;
 	Vector2f spawnPosition;
 };
