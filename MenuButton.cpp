@@ -50,7 +50,7 @@ void MenuButton::standart() {
 
 void MenuButton::click() {
   isClick = true;
-  button.setTextureRect(IntRect(nextRect.x, nextRect.y, sizeRect.x, sizeRect.y));
+  button.setTextureRect(IntRect(nextRect.x, nextRect.y, sizeRect.x, sizeRect.y-5));
 }
 
 bool MenuButton::listen(RenderWindow& window, Sound& sound) {

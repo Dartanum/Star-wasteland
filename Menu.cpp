@@ -1,14 +1,18 @@
 #include "Menu.h"
 
-Menu::Menu(settings& _setting, Texture& texture, Texture& backText, Texture& background_, Vector2u& ScreenSize, Font& font_) {
-  textures = texture;
-  background.setTexture(background_);
+Menu::Menu(settings& _setting, TopResults& records, textureLoader& textures_, Vector2u& ScreenSize, Font& font_, Font& recordFont) {
+  textures = textures_.menu["mainTile"];
+  logo.setTexture(textures_.menu["logo"]);
+  sliderTexture = textures_.menu["slider"];
+  back.setTexture(&textures_.menu["panel"]);
+  background.setTexture(textures_.background);
   screenSize = ScreenSize;
   font = font_;
-  back.setTexture(&backText);
+  topFont = recordFont;
   buttonSize = Vector2f(screenSize.x / 10, screenSize.y / 20);
   settings_ = _setting;
-
+  top = records;
+  delayFrame = 10;
   clickBuffer.loadFromFile("sounds/Menu/click1.ogg");
   rolloverBuffer.loadFromFile("sounds/Menu/rollover2.ogg");
 
@@ -22,7 +26,7 @@ Menu::Menu(settings& _setting, Texture& texture, Texture& backText, Texture& bac
   reader.close();
 }
 
-bool Menu::menu(RenderWindow& window, Texture& logotip) {
+bool Menu::menu(RenderWindow& window) {
   bool isMenu = true;
   int interval = 10;
   int countBut = 5;
@@ -31,7 +35,6 @@ bool Menu::menu(RenderWindow& window, Texture& logotip) {
   int lastClick = -1;
   bool abroad = true;
 
-  logo.setTexture(logotip);
   String names[] = {L"play", L"rules", L"records", L"settings", L"exit"};
   for (ptrdiff_t i = 0; i < countBut; i++) {
     buttons.push_back(MenuButton(textures, Vector2f(190, 50), Vector2f(0, 0), Vector2f(0, 49), buttonSize, names[i], font));
@@ -50,6 +53,7 @@ bool Menu::menu(RenderWindow& window, Texture& logotip) {
   for (ptrdiff_t i = 1; i < buttons.size(); i++) {
     buttons[i].setPos(buttons[i-1], interval);
   }
+  int currentFrame = 0;
 //------------------------------МЕНЮ-------------------------------------
   while (isMenu) {
     Event event;
@@ -58,52 +62,64 @@ bool Menu::menu(RenderWindow& window, Texture& logotip) {
       if (event.type == Event::Closed)
         window.close();
     }
-    if (!clickSound.getStatus() && lastClick != -1) {
-      buttons[lastClick].standart();
-      lastClick = -1;
+    currentFrame = clock.getElapsedTime().asMilliseconds() / 16;
+    if (currentFrame > delayFrame) {
+      if (!clickSound.getStatus() && lastClick != -1) {
+        buttons[lastClick].standart();
+        lastClick = -1;
+      }
+      butNum = -1; //номер кнопки, на которую наведен курсор
+      window.clear();
+      window.draw(background);
+      window.draw(logo);
+      window.draw(back);
+      abroad = true; //если курсор за границей кнопок, то true
+      for (ptrdiff_t i = 0; i < buttons.size(); i++) {
+        if (buttons[i].container.contains(Mouse::getPosition(window))) {
+          abroad = false;
+        }
+        else buttons[i].standart();
+      }
+      if (abroad) lastRoll = -1;
+      for (ptrdiff_t i = 0; i < buttons.size(); i++) {
+        if (buttons[i].container.contains(Mouse::getPosition(window))) {
+          if (lastRoll != i) rolloverSound.play();
+          buttons[i].button.setFillColor(Color::Green);
+          butNum = i;
+          lastRoll = i;
+        }
+        if (Mouse::isButtonPressed(Mouse::Left) && butNum == i) {
+          if (lastClick != i) clickSound.play();
+          buttons[i].click();
+          lastClick = i;
+        }
+        window.draw(buttons[i].button);
+        window.draw(buttons[i].text);
+        if (buttons[0].isClick) {
+          isMenu = false;
+        }
+        if (buttons[1].isClick) {
+          Rules(window);
+          clock.restart();
+          break;
+        }
+        if (buttons[2].isClick) {
+          Records(window);
+          clock.restart();
+          break;
+        }
+        if (buttons[3].isClick) {
+          Settings(window);
+          clock.restart();
+          break;
+        }
+        if (buttons[4].isClick) {
+          window.close();
+          return true;
+        }
+      }
+      window.display();
     }
-    butNum = -1; //номер кнопки, на которую наведен курсор
-    window.clear();
-    window.draw(background);
-    window.draw(logo);
-    window.draw(back);
-    abroad = true; //если курсор за границей кнопок, то true
-    for (ptrdiff_t i = 0; i < buttons.size(); i++) {
-      if (buttons[i].container.contains(Mouse::getPosition(window))) {
-        abroad = false;
-      } 
-      else buttons[i].standart();
-    }
-    if (abroad) lastRoll = -1;
-    for (ptrdiff_t i = 0; i < buttons.size(); i++) {
-      if (buttons[i].container.contains(Mouse::getPosition(window))) {
-        if (lastRoll != i) rolloverSound.play();
-        buttons[i].button.setFillColor(Color::Green);
-        butNum = i;
-        lastRoll = i;
-      }
-      if (Mouse::isButtonPressed(Mouse::Left) && butNum == i) {
-        if (lastClick != i) clickSound.play();
-        buttons[i].click();
-        lastClick = i;
-      }
-      window.draw(buttons[i].button);
-      window.draw(buttons[i].text);
-      if (buttons[0].isClick) isMenu = false;
-      if (buttons[1].isClick) {
-        Rules(window);
-        break;
-      }
-      if (buttons[3].isClick) {
-        Settings(window);
-        break;
-      }
-      if (buttons[4].isClick) {
-        window.close();
-        return true;
-      }
-    }
-    window.display();
   }
   return false;
 }
@@ -127,7 +143,6 @@ void Menu::Rules(RenderWindow& window) {
   ruless.setOrigin(ruless.getGlobalBounds().width / 2, ruless.getGlobalBounds().height / 2);
   ruless.setPosition(listBack.getPosition());
   ButtonClose.setPos(Vector2f(listBack.getPosition().x + listBack.getGlobalBounds().width / 2 - buttonSize.x / 2, listBack.getPosition().y + listBack.getGlobalBounds().height / 2 + buttonSize.y / 2));
-  bool chooseClose = false;
 
   while (isOpen) {
     isOpen = !ButtonClose.listen(window, clickSound);
@@ -141,15 +156,40 @@ void Menu::Rules(RenderWindow& window) {
   }
 }
 
+void Menu::Records(RenderWindow& window) {
+  Sound clickSound(clickBuffer);
+  int charSize = 25;
+  top.makeView(charSize, topFont, Color::Black);
+  Text text = top.text;
+  int interval = 50;
+  int intervalBetweenButton = 10;
+  RectangleShape listBack(Vector2f(text.getGlobalBounds().width + interval, text.getGlobalBounds().height + interval));
+  listBack.setOrigin(listBack.getSize().x / 2, listBack.getSize().y / 2);
+  listBack.setPosition(screenSize.x / 2, screenSize.y / 2);
+  listBack.setTexture(back.getTexture());
+  text.setPosition(listBack.getPosition());
+  MenuButton ButtonClose(textures, Vector2f(190, 50), Vector2f(0, 0), Vector2f(0, 49), buttonSize, L"close", font);
+  ButtonClose.setPos(Vector2f(listBack.getPosition().x, listBack.getPosition().y + listBack.getSize().y / 2 + ButtonClose.button.getSize().y / 2 + intervalBetweenButton));
+  bool isOpen = true;
+  while (isOpen) {
+    isOpen = !ButtonClose.listen(window, clickSound);
+    window.clear();
+    window.draw(background);
+    window.draw(listBack);
+    window.draw(text);
+    window.draw(ButtonClose.button);
+    window.draw(ButtonClose.text);
+    window.display();
+  }
+}
+
 void Menu::Settings(RenderWindow& window) {
   settings_.read();
   std::vector<Vector2f> rects;
-  Texture sliderTexture;
-  sliderTexture.loadFromFile("textures/Menu/slider.png");
   //ТЕКСТ
   String soundS, musicS, volumeS;
   soundS = "sound"; musicS = "music"; volumeS = "volume";
-  int charSize = screenSize.x * screenSize.y / 100000;
+  int charSize = 20;
   std::map<String, Text> texts;
   std::map<String, Text>::iterator it;
   texts[soundS] = Text();
@@ -212,9 +252,9 @@ void Menu::Settings(RenderWindow& window) {
       settings_ = newSettings;
       settings_.write();
     }
-    if(lineS.containerSlider.contains(Mouse::getPosition(window)))
+    if(Mouse::isButtonPressed && lineS.containerSlider.contains(Mouse::getPosition(window)))
       lineS.listen(window);
-    else if(lineM.containerSlider.contains(Mouse::getPosition(window)))
+    else if(Mouse::isButtonPressed && lineM.containerSlider.contains(Mouse::getPosition(window)))
     lineM.listen(window);
     window.clear();
     window.draw(background);
@@ -239,10 +279,6 @@ void Menu::Settings(RenderWindow& window) {
     texts[volumeS].setPosition(texts[volumeS].getPosition().x, texts[volumeS].getPosition().y - intervalY);
     window.display();
   }
-}
-
-double Menu::calcDistanceVolume(RectangleShape& slider, int volume) {
-  return slider.getPosition().x + (slider.getSize().x / 100.0 * volume);
 }
 
 std::vector<Vector2f> Menu::chooseStateCheckbox(bool isSound) {

@@ -6,6 +6,7 @@
 #include "spawner.h"
 #include "Menu.h"
 #include "settings.h"
+#include "TopResults.h"
 
 #include <math.h>
 #include <sstream>
@@ -49,19 +50,27 @@ int main(int args, char *argv[])
     tl.loader(Objects::WEAPON, path);
     path = "textures/UI/shield.png";
     tl.loader(Objects::UI, path);
-    Font font;
+    Font font, monoFont;
     font.loadFromFile("fonts/17734.otf");
+    monoFont.loadFromFile("fonts/monosize.ttf");
 
-    Texture buttons, panel, logo;
-    buttons.loadFromFile("textures/Menu/blueSheet.png");
-    panel.loadFromFile("textures/Menu/grey_panel.png");
-    logo.loadFromFile("textures/logo.png");
+    std::map<std::string, sf::String> menuSource;
+    menuSource["mainTile"] = "textures/Menu/blueSheet.png";
+    menuSource["panel"] = "textures/Menu/grey_panel.png";
+    menuSource["logo"] = "textures/logo.png";
+    menuSource["slider"] = "textures/Menu/slider.png";
+    tl.loderMenu(menuSource);
+
     std::string settingsPath = "text/settings.ini";
-
+    std::string recordsPath = "text/records.ini";
     settings settingsGame(settingsPath);
     settingsGame.read();
-    Menu main_menu(settingsGame, buttons, panel, tl.background, screen, font);
-    if (main_menu.menu(window, logo)) return 0;
+    TopResults records(recordsPath);
+    records.read();
+
+    Menu main_menu(settingsGame, records, tl, screen, font, monoFont);
+    if (main_menu.menu(window)) return 0;
+    settingsGame.read();
 //---------------------------------ÌÓÇÛÊÀ È ÇÂÓÊÈ---------------------------------
     SoundBuffer boomBuffer;
     if (!boomBuffer.loadFromFile("sounds/Boom.ogg"))
@@ -156,10 +165,12 @@ int main(int args, char *argv[])
     asteroids.push_back(new Asteroid(sizeAsteroid, spawner.generator(speed, 0.2), asteroidKD, spawner.generatorAsteroids(screen), 120, tl.asteroids[0]));
     radius = spawner.generator(100, sizePlanet);
     area = spawner.chooseArea(spawnPointsPlanet, useSpawnPointsPlanet);
-    planets.push_back(new Planet(radius, 5.0f, tl.planets[spawner.generator(0, tl.planets.size()-1)], spawner.generatorPlanets(screen, spawnPointsPlanet, radius, area), radius/10, 5, area, font, tl.ui[0]));
+    planets.push_back(new Planet(radius, 5.0f, tl.planets[spawner.generator(0, tl.planets.size()-1)], spawner.generatorPlanets(screen, spawnPointsPlanet, radius, area), 
+                                  radius/10, spawner.generator(5, 15), area, font, tl.ui[0]));
     radius = spawner.generator(100, sizePlanet);
     area = spawner.chooseArea(spawnPointsPlanet, useSpawnPointsPlanet);
-    planets.push_back(new Planet(radius, 9.0f, tl.planets[spawner.generator(0, tl.planets.size() - 1)], spawner.generatorPlanets(screen, spawnPointsPlanet, radius, area), radius/10, 10, area, font, tl.ui[0]));
+    planets.push_back(new Planet(radius, 9.0f, tl.planets[spawner.generator(0, tl.planets.size() - 1)], spawner.generatorPlanets(screen, spawnPointsPlanet, radius, area),
+                                  radius/10, spawner.generator(5, 15), area, font, tl.ui[0]));
 //-------------------------------ÈÃÐÎÂÎÉ ÏÐÎÖÅÑÑ---------------------------------------------------------------
     while (window.isOpen())
     {
@@ -236,6 +247,12 @@ int main(int args, char *argv[])
           }
 //-----------------------------------ÏËÀÍÅÒÛ----------------------------------------------------
           for (it_p = planets.begin(); it_p != planets.end(); it_p++) {
+            //âûâîä õï ïëàíåòû è çíà÷êà ïðî÷íîñòè
+            if ((*it_p)->born) {
+              window.draw((*it_p)->icon);
+              (*it_p)->hpView.setString(std::to_string((*it_p)->currentHp) + " / " + std::to_string((*it_p)->hp));
+              window.draw((*it_p)->hpView);
+            }
             //ñìåðòü ïëàíåòû
             if ((*it_p)->currentHp <= 0 && !(*it_p)->destroy) {
               (*it_p)->deathTime = gameTime;
@@ -271,12 +288,6 @@ int main(int args, char *argv[])
             (*it_p)->Rotation();
             if((*it_p)->born == true || (*it_p)->destroy)
               window.draw((*it_p)->planet);
-            //âûâîä õï ïëàíåòû è çíà÷êà ïðî÷íîñòè
-            if ((*it_p)->born) {
-              window.draw((*it_p)->icon);
-              (*it_p)->hpView.setString(std::to_string((*it_p)->currentHp) + " / " + std::to_string((*it_p)->hp));
-              window.draw((*it_p)->hpView);
-            }
           }
 //---------------------------------------------------------------------------------------------------          
           if (life) {

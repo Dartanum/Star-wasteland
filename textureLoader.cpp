@@ -27,7 +27,7 @@ void textureLoader::loader(enum Objects obj, std::vector<String>& paths) {
 			case Objects::UI:
 				ui.push_back(i);
 				break;
-			}	
+			}					 
 		}
 }
 
@@ -54,4 +54,18 @@ void textureLoader::loader(enum Objects obj, String& path) {
 			ui.push_back(texture);
 			break;
 		}
+}
+
+void textureLoader::loderMenu(std::map<std::string, sf::String>& textures) {
+	Texture temp;
+	for (auto& item : textures) {
+		temp.loadFromFile(item.second);
+		menu[item.first] = temp;
+	}
+}
+
+void textureLoader::loderMenu(sf::String path, std::string name) {
+	Texture texture;
+	texture.loadFromFile(path);
+	menu[name] = texture;
 }
