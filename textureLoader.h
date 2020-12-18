@@ -13,7 +13,8 @@ enum Objects{
 	ASTEROID,
 	WEAPON,
 	DEST_EFFECT,
-	UI
+	UI,
+	BACKGROUND
 };
 
 class textureLoader
@@ -25,8 +26,8 @@ public:
 	std::vector<Texture> weapons;
 	std::vector<Texture> dest_effect;
 	std::vector<Texture> ui;
+	std::vector<Texture> backgrounds;
 	std::map<std::string, sf::Texture> menu;
-	Texture background;
 
 	textureLoader() = default;
 	textureLoader(textureLoader&) = default;

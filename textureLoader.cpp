@@ -27,6 +27,9 @@ void textureLoader::loader(enum Objects obj, std::vector<String>& paths) {
 			case Objects::UI:
 				ui.push_back(i);
 				break;
+			case Objects::BACKGROUND:
+				backgrounds.push_back(i);
+				break;
 			}					 
 		}
 }
@@ -52,6 +55,9 @@ void textureLoader::loader(enum Objects obj, String& path) {
 			break;
 		case Objects::UI:
 			ui.push_back(texture);
+			break;
+		case Objects::BACKGROUND:
+			backgrounds.push_back(texture);
 			break;
 		}
 }

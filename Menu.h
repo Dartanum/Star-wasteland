@@ -21,7 +21,7 @@ class Menu
 public:
   Menu(settings& setting, TopResults& records, textureLoader& textures, Vector2u& ScreenSize, Font& font, Font& recordFont);
   bool menu(RenderWindow& window);
-  //bool endGameMenu(std::string pathTop, );
+  bool endGameMenu(RenderWindow& window, int gameTime, int pointsCount);
 private:
   Clock clock;
   float delayFrame;
@@ -30,7 +30,7 @@ private:
   SoundBuffer rolloverBuffer;
   Texture textures;
   Texture sliderTexture;
-  Sprite background;
+  RectangleShape background;
   Sprite logo;
   Vector2u screenSize;
   Vector2f buttonSize;

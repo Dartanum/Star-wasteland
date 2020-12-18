@@ -25,11 +25,12 @@ public:
   void setPos(RectangleShape& back, int interval);
   void setPos(Vector2f position);
   void setSizeRelativeText();
+  bool listen(RenderWindow& window, Sound& soundClick, Sound& soundRoll);
+private:
   void standart();
   void click();
-  bool listen(RenderWindow& window, Sound& sound);
-private:
   Clock clock;
+  bool choose;
 };
 #endif
 

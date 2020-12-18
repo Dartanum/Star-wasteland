@@ -5,7 +5,9 @@ Menu::Menu(settings& _setting, TopResults& records, textureLoader& textures_, Ve
   logo.setTexture(textures_.menu["logo"]);
   sliderTexture = textures_.menu["slider"];
   back.setTexture(&textures_.menu["panel"]);
-  background.setTexture(textures_.background);
+  back.setTextureRect(IntRect(88, 33, 433, 538));
+  background.setSize(Vector2f(ScreenSize.x, ScreenSize.y));
+  background.setTexture(&textures_.backgrounds[0]);
   screenSize = ScreenSize;
   font = font_;
   topFont = recordFont;
@@ -31,9 +33,6 @@ bool Menu::menu(RenderWindow& window) {
   int interval = 10;
   int countBut = 5;
   int butNum = -1;
-  int lastRoll = -1;
-  int lastClick = -1;
-  bool abroad = true;
 
   String names[] = {L"play", L"rules", L"records", L"settings", L"exit"};
   for (ptrdiff_t i = 0; i < countBut; i++) {
@@ -64,59 +63,38 @@ bool Menu::menu(RenderWindow& window) {
     }
     currentFrame = clock.getElapsedTime().asMilliseconds() / 16;
     if (currentFrame > delayFrame) {
-      if (!clickSound.getStatus() && lastClick != -1) {
-        buttons[lastClick].standart();
-        lastClick = -1;
-      }
-      butNum = -1; //номер кнопки, на которую наведен курсор
       window.clear();
       window.draw(background);
       window.draw(logo);
       window.draw(back);
-      abroad = true; //если курсор за границей кнопок, то true
       for (ptrdiff_t i = 0; i < buttons.size(); i++) {
-        if (buttons[i].container.contains(Mouse::getPosition(window))) {
-          abroad = false;
-        }
-        else buttons[i].standart();
-      }
-      if (abroad) lastRoll = -1;
-      for (ptrdiff_t i = 0; i < buttons.size(); i++) {
-        if (buttons[i].container.contains(Mouse::getPosition(window))) {
-          if (lastRoll != i) rolloverSound.play();
-          buttons[i].button.setFillColor(Color::Green);
+        if (buttons[i].listen(window, clickSound, rolloverSound))
           butNum = i;
-          lastRoll = i;
-        }
-        if (Mouse::isButtonPressed(Mouse::Left) && butNum == i) {
-          if (lastClick != i) clickSound.play();
-          buttons[i].click();
-          lastClick = i;
-        }
+        else butNum = -1;
         window.draw(buttons[i].button);
         window.draw(buttons[i].text);
-        if (buttons[0].isClick) {
+        switch (butNum) {
+        case -1: continue;
+        case 0:
           isMenu = false;
-        }
-        if (buttons[1].isClick) {
+          break;
+        case 1:
           Rules(window);
           clock.restart();
           break;
-        }
-        if (buttons[2].isClick) {
+        case 2:
           Records(window);
           clock.restart();
           break;
-        }
-        if (buttons[3].isClick) {
+        case 3:
           Settings(window);
           clock.restart();
           break;
-        }
-        if (buttons[4].isClick) {
+        case 4:
           window.close();
           return true;
         }
+        if (butNum != -1) break;
       }
       window.display();
     }
@@ -127,13 +105,13 @@ bool Menu::menu(RenderWindow& window) {
 void Menu::Rules(RenderWindow& window) {
   bool isOpen = true;
   Sound clickSound(clickBuffer);
+  Sound rolloverSound(rolloverBuffer);
   Text ruless;
-  ruless.setCharacterSize(16);
+  ruless.setCharacterSize(20);
   ruless.setFillColor(Color::Black);
   ruless.setFont(font);
   ruless.setString(rules);
   MenuButton ButtonClose(textures, Vector2f(190, 50), Vector2f(0, 0), Vector2f(0, 49), buttonSize, L"close", font);
-  ButtonClose.setSizeRelativeText();
   Vector2f interval(ruless.getGlobalBounds().width / 10, ruless.getGlobalBounds().height / 10);
   RectangleShape listBack(Vector2f(ruless.getGlobalBounds().width + interval.x, ruless.getGlobalBounds().height + interval.y));
   listBack.setTexture(back.getTexture());
@@ -145,7 +123,7 @@ void Menu::Rules(RenderWindow& window) {
   ButtonClose.setPos(Vector2f(listBack.getPosition().x + listBack.getGlobalBounds().width / 2 - buttonSize.x / 2, listBack.getPosition().y + listBack.getGlobalBounds().height / 2 + buttonSize.y / 2));
 
   while (isOpen) {
-    isOpen = !ButtonClose.listen(window, clickSound);
+    isOpen = !ButtonClose.listen(window, clickSound, rolloverSound);
     window.clear();
     window.draw(background);
     window.draw(listBack);
@@ -158,6 +136,7 @@ void Menu::Rules(RenderWindow& window) {
 
 void Menu::Records(RenderWindow& window) {
   Sound clickSound(clickBuffer);
+  Sound rolloverSound(rolloverBuffer);
   int charSize = 25;
   top.makeView(charSize, topFont, Color::Black);
   Text text = top.text;
@@ -167,12 +146,13 @@ void Menu::Records(RenderWindow& window) {
   listBack.setOrigin(listBack.getSize().x / 2, listBack.getSize().y / 2);
   listBack.setPosition(screenSize.x / 2, screenSize.y / 2);
   listBack.setTexture(back.getTexture());
+  listBack.setTextureRect(back.getTextureRect());
   text.setPosition(listBack.getPosition());
   MenuButton ButtonClose(textures, Vector2f(190, 50), Vector2f(0, 0), Vector2f(0, 49), buttonSize, L"close", font);
   ButtonClose.setPos(Vector2f(listBack.getPosition().x, listBack.getPosition().y + listBack.getSize().y / 2 + ButtonClose.button.getSize().y / 2 + intervalBetweenButton));
   bool isOpen = true;
   while (isOpen) {
-    isOpen = !ButtonClose.listen(window, clickSound);
+    isOpen = !ButtonClose.listen(window, clickSound, rolloverSound);
     window.clear();
     window.draw(background);
     window.draw(listBack);
@@ -235,6 +215,7 @@ void Menu::Settings(RenderWindow& window) {
   bool isOpen = true;
   settings newSettings(settings_);
   Sound clickSound(clickBuffer);
+  Sound rolloverSound(rolloverBuffer);
   while (isOpen)
   {
     if (checkboxS.listen(window, clickSound)) {
@@ -243,10 +224,10 @@ void Menu::Settings(RenderWindow& window) {
     if (checkboxM.listen(window, clickSound)) {
       newSettings.musicIsOn = !newSettings.musicIsOn;
     }
-    if (ButtonClose.listen(window, clickSound)) {
+    if (ButtonClose.listen(window, clickSound, rolloverSound)) {
       isOpen = false;
     }
-    else if (ButtonSave.listen(window, clickSound)) {
+    else if (ButtonSave.listen(window, clickSound, rolloverSound)) {
       newSettings.soundVolume = lineS.process;
       newSettings.musicVolume = lineM.process;
       settings_ = newSettings;
@@ -308,4 +289,13 @@ std::vector<Vector2f> Menu::chooseStateCheckbox(bool isSound) {
   result.push_back(beginRect);
   result.push_back(nextRect);
   return result;
+}
+
+bool Menu::endGameMenu(RenderWindow& window, int gameTime, int pointsCount) {
+  //Text text;
+  //text.setFont(font);
+  //text.setCharacterSize(20);
+  //text.setFillColor(Color::Black);
+  //String str;
+  //str = "points: " + std::to_string(pointsCount);
 }

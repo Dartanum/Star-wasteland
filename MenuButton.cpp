@@ -15,6 +15,7 @@ MenuButton::MenuButton(Texture& texture_, Vector2f textureRectSize, Vector2f beg
   text.setOrigin(Vector2f(text.getGlobalBounds().width / 2, text.getGlobalBounds().height / 2));
   button.setTextureRect(IntRect(beginRect.x, beginRect.y, sizeRect.x, sizeRect.y));
   isClick = false;
+  choose = false;
 }
 
 void MenuButton::setPos(MenuButton& buttonAbove, int interval) {
@@ -53,24 +54,30 @@ void MenuButton::click() {
   button.setTextureRect(IntRect(nextRect.x, nextRect.y, sizeRect.x, sizeRect.y-5));
 }
 
-bool MenuButton::listen(RenderWindow& window, Sound& sound) {
-  bool chooseClose = false;
+bool MenuButton::listen(RenderWindow& window, Sound& soundClick, Sound& soundRoll) {
+  bool abroad = true;
   int currentFrame = clock.getElapsedTime().asMilliseconds() / 16;
+
+  if (isClick) isClick = !isClick;
   if (container.contains(Mouse::getPosition(window))) {
+    abroad = false;
+  }
+  else standart();
+  if (abroad) choose = false;
+  if (container.contains(Mouse::getPosition(window))) {
+    if (choose == false) soundRoll.play();
     button.setFillColor(Color::Green);
-    chooseClose = true;
+    choose = true;
   }
   else {
     button.setFillColor(Color::White);
-    chooseClose = false;
+    choose = false;
   }
-  if(currentFrame > 20) button.setTextureRect(IntRect(beginRect.x, beginRect.y, sizeRect.x, sizeRect.y));
-  if (Mouse::isButtonPressed(Mouse::Left) && chooseClose && currentFrame > 20) {
+  if (currentFrame > 20) button.setTextureRect(IntRect(beginRect.x, beginRect.y, sizeRect.x, sizeRect.y));
+  if (Mouse::isButtonPressed(Mouse::Left) && choose && currentFrame > 20) {
     click();
-    sound.play();
-    chooseClose = false;
+    soundClick.play();
     clock.restart();
-    return true;
   }
-  return false;
+  return isClick;
 }

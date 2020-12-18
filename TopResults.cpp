@@ -6,7 +6,6 @@ void TopResults::makeView(int charSize, sf::Font& font, sf::Color color) {
   text.setFont(font);
   text.setFillColor(color);
   text.setCharacterSize(charSize);
-  //int charWidth = font.
   int lName, lPoint, lTime, totalLength;
   lName = lPoint = lTime = 0;
   int minName, minPoint, minTime, minLength, titleLength, countSpace;

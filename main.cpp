@@ -26,7 +26,7 @@ int main(int args, char *argv[])
   window.setFramerateLimit(FPS);
 //---------------------------------“≈ —“”–џ » Ў–»‘“џ------------------------------------------
     textureLoader tl;
-    Texture texture;
+    std::vector<String> textures;
     Texture dest_effect_planet;
     dest_effect_planet.loadFromFile("textures/Destroy_effects_planet/dest_effect.png");
     std::vector<String> paths;
@@ -41,9 +41,11 @@ int main(int args, char *argv[])
     tl.loader(Objects::DEST_EFFECT, paths1);
     String path = "textures/player/player.png";
     tl.loader(Objects::PLAYER, path);
-    texture.loadFromFile("textures/planet/Space.png");
+    for (ptrdiff_t i = 0; i < 3; i++) {
+      textures.push_back("textures/Backgrounds/back" + std::to_string(i+1) + ".jpg");
+    }
+    tl.loader(Objects::BACKGROUND, textures);
     tl.loader(Objects::PLANET, paths);
-    tl.background = texture;
     path = "textures/asteroid/meteorBrown_big4.png";
     tl.loader(Objects::ASTEROID, path);
     path = "textures/weapon/laserBlue03.png";
@@ -56,7 +58,7 @@ int main(int args, char *argv[])
 
     std::map<std::string, sf::String> menuSource;
     menuSource["mainTile"] = "textures/Menu/blueSheet.png";
-    menuSource["panel"] = "textures/Menu/grey_panel.png";
+    menuSource["panel"] = "textures/Menu/panel.png";
     menuSource["logo"] = "textures/logo.png";
     menuSource["slider"] = "textures/Menu/slider.png";
     tl.loderMenu(menuSource);
@@ -127,7 +129,8 @@ int main(int args, char *argv[])
     int points = 0; //количество очков
     Clock gameTimeClock; //часы игры
     Clock clock; 
-    Sprite background; //фон игры
+    RectangleShape background; //фон игры
+    background.setSize(Vector2f(screen.x, screen.y));
     bool life = true; //жив ли игрок
     bool spaceClick = false; //нажата ли кнопка space
     float weaponKD = 1.5; //врем€, через которое бластер обновл€етс€
@@ -139,7 +142,7 @@ int main(int args, char *argv[])
     std::vector<Vector2f> spawnPointsPlanet;
     std::map<int, Vector2f> useSpawnPointsPlanet;
 
-    background.setTexture(tl.background);
+    background.setTexture(&tl.backgrounds[1]);
 
     //установка точек-границ спавна планет
     for (ptrdiff_t i = 0; i < 3; i++) {
@@ -188,7 +191,7 @@ int main(int args, char *argv[])
         }
         while (window.pollEvent(event))
         {
-            if (event.type == Event::Closed)
+            if (event.type == Event::Closed || Keyboard::isKeyPressed(Keyboard::Escape))
                 window.close();
         }
         if (Keyboard::isKeyPressed(Keyboard::Left) && life) { 
@@ -212,9 +215,6 @@ int main(int args, char *argv[])
             weapon.clock.restart();
             shoot.play();
           }
-        }
-        if (Keyboard::isKeyPressed(Keyboard::Escape)) {
-          //пауза
         }
 //--------------------------------»Ќ‘ќ–ћј÷»я--------------------------------------------------
           std::ostringstream gameTimeString, playerPointsString;
