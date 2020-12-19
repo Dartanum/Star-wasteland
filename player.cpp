@@ -8,7 +8,7 @@ Player::Player(Texture& texture, const double& speed, const double& angularSpeed
     Player::speed = speed;
     Player::angularSpeed = angularSpeed;
     player.setOrigin(w / 2, h / 2);
-    player.setPosition(500, 500);
+    player.setPosition(Screen.x/2, Screen.y/2);
     anim_end = false;
 }
 
@@ -75,7 +75,7 @@ Vector2f Player::getPos() {
     return player.getPosition();
 }
 
-void Player::Destroy(std::vector<Texture>& textures) {
+void Player::Destroy(std::vector<Texture*>& textures) {
   int currentFrame = dest_anim_clock.getElapsedTime().asMilliseconds() / 16;
   dest_sprite.setPosition(pos_die);
   int anim_speed = 2;
@@ -85,7 +85,7 @@ void Player::Destroy(std::vector<Texture>& textures) {
       break;
     }
     if (currentFrame > i && currentFrame < i + anim_speed) {
-      dest_sprite.setTexture(textures[i / (anim_speed * 2)]);
+      dest_sprite.setTexture(*textures[i / (anim_speed * 2)]);
       break;
     }
   }

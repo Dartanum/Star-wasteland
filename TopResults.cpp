@@ -1,6 +1,10 @@
 #include "TopResults.h"
 
-TopResults::TopResults(std::string& Path) : path(Path) {}
+TopResults::TopResults(std::string& Path, int SizeTop) : path(Path), sizeTop(SizeTop), defaultResult({"", 0, 0}) {}
+
+bool Result::operator==(const Result rhs) const {
+  return (name == rhs.name && points == rhs.points && time == rhs.time);
+}
 
 void TopResults::makeView(int charSize, sf::Font& font, sf::Color color) {
   text.setFont(font);
@@ -31,11 +35,12 @@ void TopResults::makeView(int charSize, sf::Font& font, sf::Color color) {
   std::stringstream stream;
   stream << makeSpace(totalLength / 2 - titleLength / 2) << title << "\n";
   stream << makeSpace(2) << name << makeSpace(1 + lName - minName) << points << makeSpace(1 + lPoint - minPoint) << time << "\n";
-  for (ptrdiff_t i = 0; i < top.size(); i++) {
-    stream << std::to_string(i + 1) << makeSpace(1) << top[i].name << makeSpace(lName - top[i].name.length() + 1) <<
-              std::to_string(top[i].points) << makeSpace(lPoint - std::to_string(top[i].points).length() + 1) << std::to_string(top[i].time);
-    if (i != top.size() - 1) stream << "\n";
-  }
+  if(top[0] != defaultResult)
+    for (ptrdiff_t i = 0; i < top.size(); i++) {
+      stream << std::to_string(i + 1) << makeSpace(1) << top[i].name << makeSpace(lName - top[i].name.length() + 1) <<
+        std::to_string(top[i].points) << makeSpace(lPoint - std::to_string(top[i].points).length() + 1) << std::to_string(top[i].time);
+      if (i != top.size() - 1) stream << "\n";
+    }
   str = stream.str();
   text.setString(str);
   text.setOrigin(text.getGlobalBounds().width / 2, text.getGlobalBounds().height / 2);
@@ -56,6 +61,9 @@ bool TopResults::read() {
       }
       reader.close();
     }
+    else {
+      top.push_back({"", 0, 0});
+    }
     return true;
   }
   return false;
@@ -64,7 +72,8 @@ bool TopResults::read() {
 bool TopResults::write(std::string name, int point, int time) {
   top.push_back({ name, point, time });
   std::sort(top.begin(), top.end(), [](const Result& lhs, const Result& rhs) { return lhs.points > rhs.points; });
-  top.pop_back();
+  if(top.size() > sizeTop)
+    top.pop_back();
   return write();
 }
 

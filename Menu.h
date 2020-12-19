@@ -21,15 +21,15 @@ class Menu
 public:
   Menu(settings& setting, TopResults& records, textureLoader& textures, Vector2u& ScreenSize, Font& font, Font& recordFont);
   bool menu(RenderWindow& window);
-  bool endGameMenu(RenderWindow& window, int gameTime, int pointsCount);
+  int endGameMenu(RenderWindow& window, int pointsCount, int gameTime, RectangleShape& Background);
 private:
   Clock clock;
   float delayFrame;
   String rules;
   SoundBuffer clickBuffer;
   SoundBuffer rolloverBuffer;
-  Texture textures;
-  Texture sliderTexture;
+  Texture* textures;
+  Texture* sliderTexture;
   RectangleShape background;
   Sprite logo;
   Vector2u screenSize;
@@ -44,6 +44,9 @@ private:
   void Rules(RenderWindow& window);
   void Settings(RenderWindow& window);
   void Records(RenderWindow& window);
+  void buildMainMenu();
+  bool enterText(RenderWindow& window, Event& event, Text& text);
+  IntRect buildNickArea(Text& text);
   std::vector<Vector2f> chooseStateCheckbox(bool isSound);
 };
 #endif

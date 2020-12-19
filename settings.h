@@ -8,13 +8,15 @@
 class settings
 {
 public:
-  settings(std::string& Path);
+  settings(std::string& Path, int nickLength);
   settings() = default;
   settings(settings& set) = default;
   bool soundIsOn;
   bool musicIsOn;
   int soundVolume;
   int musicVolume;
+  std::string nickname;
+  int maxLengthNick;
 
   bool read();
   bool write();

@@ -36,7 +36,7 @@ void Asteroid::update(Vector2f spawn) {
 	asteroid.setPosition(spawn.x, spawn.y);
 }
 
-void Asteroid::Destroy(std::vector<Texture>& textures) {
+void Asteroid::Destroy(std::vector<Texture*>& textures) {
 	int currentFrame = dest_anim_clock.getElapsedTime().asMilliseconds() / 16;
 	dest_sprite.setPosition(dest_pos);
 	int anim_speed = 2;
@@ -46,7 +46,7 @@ void Asteroid::Destroy(std::vector<Texture>& textures) {
 			break;
 		}
 		if (currentFrame > i && currentFrame < i + anim_speed) {
-			dest_sprite.setTexture(textures[i/(anim_speed*2)]);
+			dest_sprite.setTexture(*textures[i/(anim_speed*2)]);
 			break;
 		}
 	}

@@ -1,11 +1,11 @@
 #include "CheckBox.h"
 
-CheckBox::CheckBox(Texture& texture, Vector2f SizeRect, Vector2f BeginRect, Vector2f NextRect, Vector2f Size, bool State) {
+CheckBox::CheckBox(Texture* texture, Vector2f SizeRect, Vector2f BeginRect, Vector2f NextRect, Vector2f Size, bool State) {
   size = Size;
   state = State;
   button.setSize(size);
   nextRect = NextRect;
-  button.setTexture(&texture);
+  button.setTexture(texture);
   button.setOrigin(size.x / 2, size.y / 2);
   beginRect = BeginRect;
   sizeRect = SizeRect;

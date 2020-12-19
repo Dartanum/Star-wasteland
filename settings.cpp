@@ -1,6 +1,6 @@
 #include "settings.h"
 
-settings::settings(std::string& Path) : path(Path) {}
+settings::settings(std::string& Path, int nickLength) : path(Path), maxLengthNick(nickLength) {}
 
 bool settings::read() {
   std::string line;
@@ -16,6 +16,7 @@ bool settings::read() {
       musicIsOn = std::stoi(lines[1]);
       soundVolume = std::stoi(lines[2]);
       musicVolume = std::stoi(lines[3]);
+      nickname = lines[4];
       return true;
     }
     else {
@@ -34,6 +35,7 @@ bool settings::write() {
     writer << musicIsOn << '\n';
     writer << soundVolume << '\n';
     writer << musicVolume << '\n';
+    writer << nickname << '\n';
     writer.close();
     return true;
   }
@@ -61,4 +63,5 @@ void settings::setDefault() {
   musicIsOn = 1;
   soundVolume = 20;
   musicVolume = 20;
+  nickname = "Player";
 }

@@ -32,7 +32,7 @@ public:
 	void standartCondition();
 	Vector2f getPos();
 	//анимация взрыва при проигрыше
-	void Destroy(std::vector<Texture>& textures);
+	void Destroy(std::vector<Texture*>& textures);
 
 	Clock dest_anim_clock;
 	Sprite dest_sprite;

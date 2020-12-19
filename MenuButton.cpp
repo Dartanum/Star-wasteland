@@ -1,10 +1,10 @@
 #include "MenuButton.h"
 
-MenuButton::MenuButton(Texture& texture_, Vector2f textureRectSize, Vector2f beginPosTexture, Vector2f NextRect, Vector2f size_, String name_, Font& font) {
+MenuButton::MenuButton(Texture* texture_, Vector2f textureRectSize, Vector2f beginPosTexture, Vector2f NextRect, Vector2f size_, String name_, Font& font) {
   size = size_;
   button.setSize(size);
   nextRect = NextRect;
-  button.setTexture(&texture_);
+  button.setTexture(texture_);
   button.setOrigin(size.x / 2, size.y / 2);
   beginRect = beginPosTexture;
   sizeRect = textureRectSize;

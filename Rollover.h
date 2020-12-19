@@ -16,13 +16,13 @@ public:
   RectangleShape line;
   RectangleShape slider;
   Vector2f position;
-  float finisLineX;
+  float finishLineX;
   IntRect containerSlider;
   IntRect containerLine;
-  Rollover(Texture& textureLine, Texture& textureSlider, IntRect rectSlider, Vector2f sizeLine, int beginProcess, Font& font, int charSize);
+  Rollover(Texture* textureLine, Texture* textureSlider, IntRect rectSlider, Vector2f sizeLine, int beginProcess, Font& font, int charSize);
   Rollover(Rollover&) = default;
   void setPos(Vector2f pos);
-  void listen(RenderWindow& window);
+  void listen(RenderWindow& window, Event& event);
 
 private:
   float setCurrentVolume(int volume);

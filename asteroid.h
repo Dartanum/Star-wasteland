@@ -26,7 +26,7 @@ public:
 	void setSpeed(float newSpeed) { speed = newSpeed; }
 	float getSpeed() { return speed; }
 	void setKD(float newKD) { KD = newKD; }
-	void Destroy(std::vector<Texture>& textures);
+	void Destroy(std::vector<Texture*>& textures);
 	Sprite dest_sprite;
 	RectangleShape asteroid;
 	Clock clock;

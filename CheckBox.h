@@ -21,7 +21,7 @@ public:
   Clock clock;
   bool state;
 
-  CheckBox(Texture& texture, Vector2f SizeRect, Vector2f BeginRect, Vector2f NextRect, Vector2f Size, bool State);
+  CheckBox(Texture* texture, Vector2f SizeRect, Vector2f BeginRect, Vector2f NextRect, Vector2f Size, bool State);
   void setPos(Vector2f position);
   void click();
   bool listen(RenderWindow& window, Sound& sound);

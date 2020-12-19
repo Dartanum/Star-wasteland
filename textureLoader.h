@@ -20,14 +20,14 @@ enum Objects{
 class textureLoader
 {
 public:
-	std::vector<Texture> players;
-	std::vector<Texture> planets;
-	std::vector<Texture> asteroids;
-	std::vector<Texture> weapons;
-	std::vector<Texture> dest_effect;
-	std::vector<Texture> ui;
-	std::vector<Texture> backgrounds;
-	std::map<std::string, sf::Texture> menu;
+	std::vector<Texture*> players;
+	std::vector<Texture*> planets;
+	std::vector<Texture*> asteroids;
+	std::vector<Texture*> weapons;
+	std::vector<Texture*> dest_effect;
+	std::vector<Texture*> ui;
+	std::vector<Texture*> backgrounds;
+	std::map<std::string, sf::Texture*> menu;
 
 	textureLoader() = default;
 	textureLoader(textureLoader&) = default;
