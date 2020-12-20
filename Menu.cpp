@@ -125,6 +125,12 @@ void Menu::Rules(RenderWindow& window) {
   ButtonClose.setPos(Vector2f(listBack.getPosition().x + listBack.getGlobalBounds().width / 2 - buttonSize.x / 2, listBack.getPosition().y + listBack.getGlobalBounds().height / 2 + buttonSize.y / 2));
 
   while (isOpen) {
+    Event event;
+    while (window.pollEvent(event))
+    {
+      if (event.type == Event::Closed)
+        window.close();
+    }
     isOpen = !ButtonClose.listen(window, clickSound, rolloverSound);
     window.clear();
     window.draw(background);
@@ -154,6 +160,12 @@ void Menu::Records(RenderWindow& window) {
   ButtonClose.setPos(Vector2f(listBack.getPosition().x, listBack.getPosition().y + listBack.getSize().y / 2 + ButtonClose.button.getSize().y / 2 + intervalBetweenButton));
   bool isOpen = true;
   while (isOpen) {
+    Event event;
+    while (window.pollEvent(event))
+    {
+      if (event.type == Event::Closed)
+        window.close();
+    }
     isOpen = !ButtonClose.listen(window, clickSound, rolloverSound);
     window.clear();
     window.draw(background);
@@ -252,6 +264,8 @@ void Menu::Settings(RenderWindow& window) {
       }
       lineS.listen(window, event);
       lineM.listen(window, event);
+      if (event.type == Event::Closed)
+        window.close();
     }
     if (checkboxS.listen(window, clickSound)) {
       newSettings.soundIsOn = !newSettings.soundIsOn;
@@ -372,6 +386,12 @@ int Menu::endGameMenu(RenderWindow& window, int pointsCount, int gameTime, Recta
   if (top.isRecord(pointsCount))
     top.write(settings_.nickname, pointsCount, gameTime);
   while (true) {
+    Event event;
+    while (window.pollEvent(event))
+    {
+      if (event.type == Event::Closed)
+        window.close();
+    }
     window.clear();
     window.draw(Background);
     window.draw(listBack);

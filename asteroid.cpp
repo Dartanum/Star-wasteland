@@ -1,12 +1,12 @@
 #include "asteroid.h"
 
-Asteroid::Asteroid(float Size, double Speed, float kd, Vector2f SpawnPosition, int SpawnTime, Texture& texture) :
+Asteroid::Asteroid(float Size, double Speed, float kd, Vector2f SpawnPosition, int SpawnTime, Texture* texture) :
 	size(Size), speed(Speed), spawnPosition(SpawnPosition), spawnTime(SpawnTime), KD(kd) {
 	exist = false;
 	clock.restart();
 	asteroidIsMove = false;
 	asteroid.setSize(Vector2f(size, size));
-	asteroid.setTexture(&texture);
+	asteroid.setTexture(texture);
 	asteroid.setOrigin(asteroid.getLocalBounds().width / 2, asteroid.getLocalBounds().height / 2);
 	asteroid.setPosition(SpawnPosition);
 	destroy = false;
@@ -29,11 +29,12 @@ void Asteroid::Move(Player& player) {
 	asteroid.move(direction.x * sin(-asteroid.getRotation() * PI / 180) * speed, direction.y * cos(-asteroid.getRotation() * PI / 180) * speed);
 }
 
-void Asteroid::update(Vector2f spawn) {
+void Asteroid::update(Vector2f spawn, Texture* texture) {
 	flag = true;
 	exist = true;
 	clock.restart();
 	asteroid.setPosition(spawn.x, spawn.y);
+	asteroid.setTexture(texture);
 }
 
 void Asteroid::Destroy(std::vector<Texture*>& textures) {

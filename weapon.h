@@ -12,7 +12,7 @@ public:
 	Clock clock;
 	Weapon() = default;
 	Weapon(Weapon&) = default;
-	Weapon(Texture& texture, double Speed, float kd);
+	Weapon(Texture* texture, double Speed, float kd);
 	void Move(Player& player);
 	void update();
 	bool getIsMove() { return weaponIsMove; }

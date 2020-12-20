@@ -2,8 +2,8 @@
 #include <vector>
 #include <math.h>
 
-Player::Player(Texture& texture, const double& speed, const double& angularSpeed, Vector2u Screen, const int& w, const int& h) : screen(Screen) {
-  player.setTexture(&texture);
+Player::Player(Texture* texture, const double& speed, const double& angularSpeed, Vector2u Screen, const int& w, const int& h) : screen(Screen) {
+  player.setTexture(texture);
   player.setSize(Vector2f(w, h));
     Player::speed = speed;
     Player::angularSpeed = angularSpeed;

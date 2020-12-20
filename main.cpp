@@ -26,12 +26,11 @@ int main(int args, char* argv[])
   window.setFramerateLimit(FPS);
   //---------------------------------ТЕКСТУРЫ И ШРИФТЫ------------------------------------------
   textureLoader tl;
-
   Font font, monoFont;
   font.loadFromFile("src/fonts/17734.otf");
   monoFont.loadFromFile("src/fonts/monosize.ttf");
   std::vector<String> textures;
-  for (ptrdiff_t i = 0; i < 3; i++) {
+  for (ptrdiff_t i = 0; i < 2; i++) {
     textures.push_back("src/textures/Backgrounds/back" + std::to_string(i + 1) + ".jpg");
   }
   tl.loader(Objects::BACKGROUND, textures);
@@ -41,6 +40,30 @@ int main(int args, char* argv[])
   menuSource["logo"] = "src/textures/logo.png";
   menuSource["slider"] = "src/textures/Menu/slider.png";
   tl.loderMenu(menuSource);
+  Texture dest_effect_planet;
+  std::vector<String> paths;
+  std::vector<String> paths1;
+  std::vector<String> paths2;
+  dest_effect_planet.loadFromFile("src/textures/Destroy_effects_planet/dest_effect.png");
+  for (ptrdiff_t i = 0; i < 18; i++) {
+    paths.push_back("src/textures/planet/planet" + std::to_string(i) + ".png");
+  }
+  for (ptrdiff_t i = 0; i < 9; i++) {
+    String s = "src/textures/Destroy_effects/regularExplosion0" + std::to_string(i) + ".png";
+    paths1.push_back(s);
+  }
+  for (ptrdiff_t i = 0; i < 8; i++) {
+    paths2.push_back("src/textures/asteroid/meteor" + std::to_string(i) + ".png");
+  }
+  tl.loader(Objects::DEST_EFFECT, paths1);
+  String path = "src/textures/player/player.png";
+  tl.loader(Objects::PLAYER, path);
+  tl.loader(Objects::PLANET, paths);
+  tl.loader(Objects::ASTEROID, paths2);
+  path = "src/textures/weapon/laserBlue.png";
+  tl.loader(Objects::WEAPON, path);
+  path = "src/textures/UI/shield.png";
+  tl.loader(Objects::UI, path);
 
   std::string settingsPath = "src/text/settings.ini";
   std::string recordsPath = "src/text/records.ini";
@@ -50,28 +73,6 @@ int main(int args, char* argv[])
   records.read();
   Menu main_menu(settingsGame, records, tl, screen, font, monoFont);
   if (main_menu.menu(window)) return 0;
-  Texture dest_effect_planet;
-  std::vector<String> paths;
-  std::vector<String> paths1;
-  dest_effect_planet.loadFromFile("src/textures/Destroy_effects_planet/dest_effect.png");
-  for (ptrdiff_t i = 0; i < 17; i++) {
-    paths.push_back("src/textures/planet/planet" + std::to_string(i) + ".png");
-  }
-  for (ptrdiff_t i = 0; i < 9; i++) {
-    String s = "src/textures/Destroy_effects/regularExplosion0" + std::to_string(i) + ".png";
-    paths1.push_back(s);
-  }
-  tl.loader(Objects::DEST_EFFECT, paths1);
-  String path = "src/textures/player/player.png";
-  tl.loader(Objects::PLAYER, path);
-
-  tl.loader(Objects::PLANET, paths);
-  path = "src/textures/asteroid/meteorBrown_big4.png";
-  tl.loader(Objects::ASTEROID, path);
-  path = "src/textures/weapon/laserBlue03.png";
-  tl.loader(Objects::WEAPON, path);
-  path = "src/textures/UI/shield.png";
-  tl.loader(Objects::UI, path);
   //---------------------------------МУЗЫКА И ЗВУКИ---------------------------------
   SoundBuffer boomBuffer;
   if (!boomBuffer.loadFromFile("src/sounds/Boom.ogg"))
@@ -136,8 +137,8 @@ int main(int args, char* argv[])
   background.setTexture(tl.backgrounds[1]);
 
   Spawner spawner;
-  Player player(*tl.players[0], speed, angularSpeed, screen, w, h);
-  Weapon weapon(*tl.weapons[0], speed * 2.5, weaponKD);
+  Player player(tl.players[0], speed, angularSpeed, screen, w, h);
+  Weapon weapon(tl.weapons[0], speed * 2.5, weaponKD);
   std::list<Asteroid*> asteroids;
   std::list<Asteroid*>::iterator it;
   std::list<Planet*> planets;
@@ -146,7 +147,7 @@ int main(int args, char* argv[])
   do {
     if (!life) {
       music.stop();
-      if(choice == 0)
+      if (choice == 0)
         choice = main_menu.endGameMenu(window, points, gameTime, background);
       switch (choice) {
       case 1:
@@ -185,17 +186,17 @@ int main(int args, char* argv[])
       shoot.setVolume(0);
       bornSound.setVolume(0);
     }
-//-------------------------------------------------START GAME------------------------------------------------------------------------------
+    //-------------------------------------------------START GAME------------------------------------------------------------------------------
 
-    //установка позиции логов
+        //установка позиции логов
     lifetime.setPosition(screen.x - 200, 0);
     pointCount.setPosition(screen.x - 200, 40);
 
-    asteroids.push_back(new Asteroid(sizeAsteroid, spawner.generator(speed, 0.2), asteroidKD, spawner.generatorAsteroids(screen), 5, *tl.asteroids[0]));
-    asteroids.push_back(new Asteroid(sizeAsteroid, spawner.generator(speed, 0.2), asteroidKD, spawner.generatorAsteroids(screen), 20, *tl.asteroids[0]));
-    asteroids.push_back(new Asteroid(sizeAsteroid, spawner.generator(speed, 0.2), asteroidKD, spawner.generatorAsteroids(screen), 30, *tl.asteroids[0]));
-    asteroids.push_back(new Asteroid(sizeAsteroid, spawner.generator(speed, 0.2), asteroidKD, spawner.generatorAsteroids(screen), 60, *tl.asteroids[0]));
-    asteroids.push_back(new Asteroid(sizeAsteroid, spawner.generator(speed, 0.2), asteroidKD, spawner.generatorAsteroids(screen), 120, *tl.asteroids[0]));
+    asteroids.push_back(new Asteroid(sizeAsteroid, spawner.generator(speed, 0.2), asteroidKD, spawner.generatorAsteroids(screen), 5, tl.asteroids[spawner.generator(0, tl.asteroids.size() - 1)]));
+    asteroids.push_back(new Asteroid(sizeAsteroid, spawner.generator(speed, 0.2), asteroidKD, spawner.generatorAsteroids(screen), 20, tl.asteroids[spawner.generator(0, tl.asteroids.size() - 1)]));
+    asteroids.push_back(new Asteroid(sizeAsteroid, spawner.generator(speed, 0.2), asteroidKD, spawner.generatorAsteroids(screen), 30, tl.asteroids[spawner.generator(0, tl.asteroids.size() - 1)]));
+    asteroids.push_back(new Asteroid(sizeAsteroid, spawner.generator(speed, 0.2), asteroidKD, spawner.generatorAsteroids(screen), 60, tl.asteroids[spawner.generator(0, tl.asteroids.size() - 1)]));
+    asteroids.push_back(new Asteroid(sizeAsteroid, spawner.generator(speed, 0.2), asteroidKD, spawner.generatorAsteroids(screen), 120, tl.asteroids[spawner.generator(0, tl.asteroids.size() - 1)]));
     radius = spawner.generator(100, sizePlanet);
     area = spawner.chooseArea(spawnPointsPlanet, useSpawnPointsPlanet);
     planets.push_back(new Planet(radius, 5.0f, *tl.planets[spawner.generator(0, tl.planets.size() - 1)], spawner.generatorPlanets(screen, spawnPointsPlanet, radius, area),
@@ -323,82 +324,81 @@ int main(int args, char* argv[])
         if ((*it_p)->born == true || (*it_p)->destroy)
           window.draw((*it_p)->planet);
       }
-        //------------------------------------БЛАСТЕР-------------------------------------------------
-                    //перезарядка снаряда
-        if (weapon.clock.getElapsedTime().asSeconds() > weaponKD) {
-          spaceClick = false;
+      //------------------------------------БЛАСТЕР-------------------------------------------------
+      //перезарядка снаряда
+      if (weapon.clock.getElapsedTime().asSeconds() > weaponKD) {
+        spaceClick = false;
+        weapon.update();
+        weapon.setIsMove(true);
+      }
+      //перемещение и рисование снаряда
+      if (spaceClick && weapon.getIsMove()) {
+        window.draw(weapon.weapon);
+        weapon.Move(player);
+      }
+      //--------------------------------------АСТЕРОИДЫ---------------------------------------------
+      for (it = asteroids.begin(); it != asteroids.end(); it++) {
+        //сброс времени при первом появлении астероида
+        if ((*it)->getSpawnTime() <= gameTime && !(*it)->getExist()) {
+          (*it)->clock.restart();
+          (*it)->setExist(true);
+        }
+        //первое появление астероида
+        if ((*it)->getSpawnTime() <= gameTime) {
+          (*it)->setAsteroidMove(true);
+          window.draw((*it)->asteroid);
+        }
+        //перемещение астероида
+        if ((*it)->getAsteroidMove()) (*it)->Move(player);
+        //столкновение снаряда с астероидом
+        if (weapon.weapon.getGlobalBounds().intersects((*it)->asteroid.getGlobalBounds()) && (*it)->getAsteroidMove()) {
+          (*it)->dest_pos = (*it)->asteroid.getPosition();
+          (*it)->dest_anim_clock.restart();
+          (*it)->destroy = true;
+          (*it)->update(spawner.generatorAsteroids(screen), tl.asteroids[spawner.generator(0, tl.asteroids.size() - 1)]);
           weapon.update();
-          weapon.setIsMove(true);
+          weapon.setIsMove(false);
+          (*it)->setAsteroidMove(false);
+          points += 100;
+          boom.play();
         }
-        //перемещение и рисование снаряда
-        if (spaceClick && weapon.getIsMove()) {
-          window.draw(weapon.weapon);
-          weapon.Move(player);
+        //анимация уничтожения астероида
+        if ((*it)->destroy) {
+          (*it)->Destroy(tl.dest_effect);
+          window.draw((*it)->dest_sprite);
         }
-        //--------------------------------------АСТЕРОИДЫ---------------------------------------------
-        for (it = asteroids.begin(); it != asteroids.end(); it++) {
-          //сброс времени при первом появлении астероида
-          if ((*it)->getSpawnTime() <= gameTime && !(*it)->getExist()) {
-            (*it)->clock.restart();
-            (*it)->setExist(true);
-          }
-          //первое появление астероида
-          if ((*it)->getSpawnTime() <= gameTime) {
-            (*it)->setAsteroidMove(true);
-            window.draw((*it)->asteroid);
-          }
-          //перемещение астероида
-          if ((*it)->getAsteroidMove()) (*it)->Move(player);
-          //столкновение снаряда с астероидом
-          if (weapon.weapon.getGlobalBounds().intersects((*it)->asteroid.getGlobalBounds()) && (*it)->getAsteroidMove()) {
+        //перезарядка астероида
+        if ((*it)->clock.getElapsedTime().asSeconds() > (*it)->getKD() && (*it)->getExist()) {
+          (*it)->setAsteroidMove(true);
+          (*it)->update(spawner.generatorAsteroids(screen), tl.asteroids[spawner.generator(0, tl.asteroids.size() - 1)]);
+        }
+        //столкновение астероида с планетой
+        for (it_p = planets.begin(); it_p != planets.end(); it_p++) {
+          if ((*it_p)->Intersects((*it)->asteroid) && (*it_p)->born) {
             (*it)->dest_pos = (*it)->asteroid.getPosition();
             (*it)->dest_anim_clock.restart();
             (*it)->destroy = true;
-            (*it)->update(spawner.generatorAsteroids(screen));
-            weapon.update();
-            weapon.setIsMove(false);
+            (*it)->update(spawner.generatorAsteroids(screen), tl.asteroids[spawner.generator(0, tl.asteroids.size() - 1)]);
             (*it)->setAsteroidMove(false);
-            points += 100;
+            (*it_p)->currentHp -= 1;
             boom.play();
           }
-          //анимация уничтожения астероида
-          if ((*it)->destroy) {
-            (*it)->Destroy(tl.dest_effect);
-            window.draw((*it)->dest_sprite);
-          }
-          //перезарядка астероида
-          if ((*it)->clock.getElapsedTime().asSeconds() > (*it)->getKD() && (*it)->getExist()) {
-            (*it)->setAsteroidMove(true);
-            (*it)->update(spawner.generatorAsteroids(screen));
-          }
-          //столкновение астероида с планетой
-          for (it_p = planets.begin(); it_p != planets.end(); it_p++) {
-            if ((*it_p)->Intersects((*it)->asteroid) && (*it_p)->born) {
-              (*it)->dest_pos = (*it)->asteroid.getPosition();
-              (*it)->dest_anim_clock.restart();
-              (*it)->destroy = true;
-              (*it)->update(spawner.generatorAsteroids(screen));
-              (*it)->setAsteroidMove(false);
-              (*it_p)->currentHp -= 1;
-              boom.play();
-            }
-          }
         }
-        //---------------------------------------------------------------------------------------------------          
-  //столкновение игрока с астероидом
-        RectangleShape body(Vector2f(player.player.getLocalBounds().width / 1.5, player.player.getLocalBounds().height / 1.5));
-        body.setOrigin(body.getGlobalBounds().width / 2, body.getGlobalBounds().height / 2);
-        body.setRotation(player.player.getRotation());
-        body.setPosition(player.getPos());
-        for (it = asteroids.begin(); it != asteroids.end(); it++) {
-          if (body.getGlobalBounds().intersects((*it)->asteroid.getGlobalBounds())) {
-            life = false;
-            player.dest_anim_clock.restart();
-            player.pos_die = Vector2f(player.getPos().x - player.player.getGlobalBounds().width / 2, player.getPos().y - player.player.getGlobalBounds().height / 2);
-            boom.play();
-            break;
-          }
+      }
+      //столкновение игрока с астероидом
+      RectangleShape body(Vector2f(player.player.getLocalBounds().width / 1.5, player.player.getLocalBounds().height / 1.5));
+      body.setOrigin(body.getGlobalBounds().width / 2, body.getGlobalBounds().height / 2);
+      body.setRotation(player.player.getRotation());
+      body.setPosition(player.getPos());
+      for (it = asteroids.begin(); it != asteroids.end(); it++) {
+        if (body.getGlobalBounds().intersects((*it)->asteroid.getGlobalBounds())) {
+          life = false;
+          player.dest_anim_clock.restart();
+          player.pos_die = Vector2f(player.getPos().x - player.player.getGlobalBounds().width / 2, player.getPos().y - player.player.getGlobalBounds().height / 2);
+          boom.play();
+          break;
         }
+      }
       window.display();
       if (!life) {
         for (it = asteroids.begin(); it != asteroids.end(); it++) {

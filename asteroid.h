@@ -11,11 +11,11 @@ class Asteroid {
 public:
 	Asteroid() = default;
 	Asteroid(Asteroid&) = default;
-	Asteroid(float Size, double Speed, float kd, Vector2f SpawnPosition, int SpawnTime, Texture& texture);
+	Asteroid(float Size, double Speed, float kd, Vector2f SpawnPosition, int SpawnTime, Texture* texture);
 	//перемещение астероида на игрока
 	void Move(Player& player);
 	//обновление позиции астероида
-	void update(Vector2f spawn);
+	void update(Vector2f spawn, Texture* texture);
 	//возврат времени спавна астероида
 	int getSpawnTime() { return spawnTime; }
 	void setExist(bool e) { exist = e; clock.restart(); }
