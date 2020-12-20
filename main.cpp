@@ -12,6 +12,7 @@
 #include <sstream>
 #include <list>
 #include <map>
+#include <Windows.h>
 #define PI 3.14159265
 
 using namespace sf;
@@ -208,6 +209,7 @@ int main(int args, char* argv[])
     //-------------------------------ИГРОВОЙ ПРОЦЕСС---------------------------------------------------------------
     while (window.isOpen())
     {
+      Minimizer::minimizeWindow(window);
       //проигрывание музыки
       if (!music.getStatus() && settingsGame.musicIsOn) {
         music.play();

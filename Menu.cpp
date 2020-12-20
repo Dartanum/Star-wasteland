@@ -1,5 +1,17 @@
 #include "Menu.h"
 
+bool Minimizer::isMinimize = false;
+WindowHandle Minimizer::handle;
+
+void Minimizer::minimizeWindow(RenderWindow& window) {
+  if (Keyboard::isKeyPressed(Keyboard::LAlt) && Keyboard::isKeyPressed(Keyboard::Tab)) {
+    handle = window.getSystemHandle();
+    if (!isMinimize)
+      ShowWindow(handle, 2);
+    else ShowWindow(handle, 1);
+  }
+}
+
 Menu::Menu(settings& _setting, TopResults& records, textureLoader& textures_, Vector2u& ScreenSize, Font& font_, Font& recordFont) {
   textures = textures_.menu["mainTile"];
   logo.setTexture(*textures_.menu["logo"]);
@@ -64,6 +76,7 @@ bool Menu::menu(RenderWindow& window) {
       if (event.type == Event::Closed)
         window.close();
     }
+    Minimizer::minimizeWindow(window);
     currentFrame = clock.getElapsedTime().asMilliseconds() / 16;
     butNum = -1;
     if (currentFrame > delayFrame) {
@@ -131,6 +144,7 @@ void Menu::Rules(RenderWindow& window) {
       if (event.type == Event::Closed)
         window.close();
     }
+    Minimizer::minimizeWindow(window);
     isOpen = !ButtonClose.listen(window, clickSound, rolloverSound);
     window.clear();
     window.draw(background);
@@ -160,6 +174,7 @@ void Menu::Records(RenderWindow& window) {
   ButtonClose.setPos(Vector2f(listBack.getPosition().x, listBack.getPosition().y + listBack.getSize().y / 2 + ButtonClose.button.getSize().y / 2 + intervalBetweenButton));
   bool isOpen = true;
   while (isOpen) {
+    Minimizer::minimizeWindow(window);
     Event event;
     while (window.pollEvent(event))
     {
@@ -242,6 +257,7 @@ void Menu::Settings(RenderWindow& window) {
   Text oldNick = texts[nick];
   while (isOpen)
   {
+    Minimizer::minimizeWindow(window);
     Event event;
     window.clear();
     window.draw(background);
@@ -386,6 +402,7 @@ int Menu::endGameMenu(RenderWindow& window, int pointsCount, int gameTime, Recta
   if (top.isRecord(pointsCount))
     top.write(settings_.nickname, pointsCount, gameTime);
   while (true) {
+    Minimizer::minimizeWindow(window);
     Event event;
     while (window.pollEvent(event))
     {

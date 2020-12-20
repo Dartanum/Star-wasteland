@@ -7,6 +7,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <Windows.h>
 
 #include "settings.h"
 #include "MenuButton.h"
@@ -16,6 +17,14 @@
 #include "TopResults.h"
 
 using namespace sf;
+
+class Minimizer {
+public:
+  static bool isMinimize;
+  static WindowHandle handle;
+  inline static void minimizeWindow(RenderWindow& window);
+};
+
 class Menu
 {
 public:
